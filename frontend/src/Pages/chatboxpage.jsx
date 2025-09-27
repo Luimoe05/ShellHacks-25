@@ -1,4 +1,3 @@
-// chatboxpage.jsx
 import React, { useMemo, useRef, useEffect, useState } from "react";
 import {
   Box,
@@ -13,24 +12,35 @@ import {
   CssBaseline,
   ThemeProvider,
   createTheme,
+  CircularProgress,
 } from "@mui/material";
-import { Send as SendIcon, AttachFile as AttachFileIcon } from "@mui/icons-material";
+import {
+  Send as SendIcon,
+  AttachFile as AttachFileIcon,
+} from "@mui/icons-material";
 import SmartToyRoundedIcon from "@mui/icons-material/SmartToyRounded";
 
+/**
+ * ChatHeroBot is the UI component, accepting all data and handlers from Gemini.jsx.
+ * All internal state and logic (initialMessages, phase, handleSend logic) have been removed.
+ */
 export default function ChatHeroBot({
+  // PROPS PASSED FROM GEMINI.JSX
+  messages, // The array of messages (user/AI)
+  input,
+  setInput,
+  sendMessage, // The function that calls the backend
+  isLoading,
+  messagesEndRef,
+  USER_ID,
+  AI_ID,
+  // UI PROPS
   accent = "linear-gradient(135deg, #2E8BC0 0%, #3BB273 100%)",
-  placeholder = "Type your message…",
+  placeholder = "Type your message… (Press Enter to send)",
 }) {
-  const initialMessages = [
-    { id: "m1", role: "bot", text: "Hi! My name is Jack\nBefore we start, tell me your name" },
-  ];
+  // Removed all internal state (messages, typing, phase, etc.)
 
-  const [messages, setMessages] = useState(withIds(initialMessages));
-  const [input, setInput] = useState("");
-  const [typing, setTyping] = useState(false);
-  const [userName, setUserName] = useState("");
-  const [phase, setPhase] = useState("ask_name");
-  const listRef = useRef(null);
+  const listRef = messagesEndRef || useRef(null);
 
   const theme = useMemo(
     () =>
@@ -48,36 +58,113 @@ export default function ChatHeroBot({
     []
   );
 
+  // The scrolling effect remains, tied to the parent's message state
   useEffect(() => {
     if (!listRef.current) return;
     listRef.current.scrollTop = listRef.current.scrollHeight;
-  }, [messages, typing]);
+  }, [messages]);
 
-  const handleSend = (textParam) => {
-    const text = (textParam ?? input).trim();
-    if (!text) return;
-
-    setMessages((m) => [...m, makeMsg("user", text)]);
-    setInput("");
-
-    const reply = computeReply({ text, phase, userName });
-    if (!reply) return;
-
-    setTyping(true);
-    setTimeout(() => {
-      setMessages((m) => [...m, makeMsg("bot", reply.text)]);
-      setTyping(false);
-      if (reply.next?.phase) setPhase(reply.next.phase);
-      if (reply.next?.userName !== undefined) setUserName(reply.next.userName);
-    }, 600);
-  };
-
+  // Use the parent's sendMessage function for Enter key events
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
+      // e.preventDefault() is handled by the form submit in sendMessage now
+      // We still prevent default here if Enter is pressed to avoid newline insertion
       e.preventDefault();
-      handleSend();
+      if (input.trim() && !isLoading) {
+        sendMessage(e);
+      }
     }
   };
+
+  // --- UI PIECES ---
+
+  function BotCard({ text, accent }) {
+    return (
+      <Stack
+        direction="row"
+        spacing={1.5}
+        alignItems="flex-start"
+        sx={{ pl: 0.5 }}
+      >
+        {/* Bot icon with gradient */}
+        <Box
+          sx={{
+            width: 48,
+            height: 48,
+            borderRadius: "50%",
+            background: accent,
+            display: "grid",
+            placeItems: "center",
+            flexShrink: 0,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+          }}
+        >
+          <Avatar
+            sx={{
+              bgcolor: "#fff",
+              width: 32,
+              height: 32,
+              color: "text.primary",
+            }}
+          >
+            <SmartToyRoundedIcon fontSize="inherit" />
+          </Avatar>
+        </Box>
+
+        {/* White card bubble */}
+        <Paper
+          elevation={6}
+          sx={{
+            px: { xs: 2, sm: 2.4 },
+            py: { xs: 1.8, sm: 2.2 },
+            borderRadius: 5,
+            boxShadow:
+              "0 10px 28px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.06)",
+            maxWidth: 620,
+            mt: -0.25,
+          }}
+        >
+          {isLoading && text === "Generating response..." ? (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <CircularProgress size={16} />
+              <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                {text}
+              </Typography>
+            </Box>
+          ) : (
+            <Typography
+              variant="body1"
+              sx={{ whiteSpace: "pre-wrap", fontWeight: 600 }}
+            >
+              {text}
+            </Typography>
+          )}
+        </Paper>
+      </Stack>
+    );
+  }
+
+  function UserPill({ text }) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "flex-end", pr: 0.5 }}>
+        <Paper
+          elevation={6}
+          sx={{
+            bgcolor: "#2E8BC0",
+            color: "#fff",
+            px: { xs: 2.8, sm: 3.2 },
+            py: { xs: 1.2, sm: 1.4 },
+            borderRadius: 999,
+            fontWeight: 700,
+            boxShadow:
+              "0 12px 26px rgba(0,0,0,0.12), 0 3px 8px rgba(0,0,0,0.06)",
+          }}
+        >
+          <Typography variant="subtitle1">{text}</Typography>
+        </Paper>
+      </Box>
+    );
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -95,7 +182,7 @@ export default function ChatHeroBot({
           flexDirection: "column",
 
           p: 3,
-          borderRadius: 2,                       // ← rectangular, slightly curved edges
+          borderRadius: 2, // ← rectangular, slightly curved edges
           border: "4px solid transparent",
           backgroundImage: `linear-gradient(#fff, #fff), ${accent}`,
           backgroundOrigin: "padding-box, border-box",
@@ -133,13 +220,24 @@ export default function ChatHeroBot({
           <Box sx={{ display: "inline-block", textAlign: "left", ml: 10 }}>
             <Typography
               variant="h1"
-              sx={{ fontWeight: 800, fontSize: { xs: 34, sm: 54 }, lineHeight: 1.15, m: 0 }}
+              sx={{
+                fontWeight: 800,
+                fontSize: { xs: 34, sm: 54 },
+                lineHeight: 1.15,
+                m: 0,
+              }}
             >
               Meet Our AI
             </Typography>
             <Typography
               variant="h1"
-              sx={{ fontWeight: 800, fontSize: { xs: 34, sm: 54 }, lineHeight: 1.15, mt: 0.25, m: 0 }}
+              sx={{
+                fontWeight: 800,
+                fontSize: { xs: 34, sm: 54 },
+                lineHeight: 1.15,
+                mt: 0.25,
+                m: 0,
+              }}
             >
               Coach{" "}
               <Box
@@ -180,18 +278,21 @@ export default function ChatHeroBot({
               px: { xs: 1.75, sm: 2.25 },
             }}
           >
+            {/* FIX: messages array is now guaranteed by props */}
             {messages.map((m) =>
-              m.role === "bot" ? (
+              m.sender === AI_ID ? (
                 <BotCard key={m.id} text={m.text} accent={accent} />
               ) : (
                 <UserPill key={m.id} text={m.text} />
               )
             )}
-            {typing && <BotCard text={<TypingDots />} accent={accent} />}
+            {/* Removed internal typing indicator logic */}
           </Stack>
 
           {/* Composer */}
           <Box
+            component="form"
+            onSubmit={sendMessage} // Use the parent's handler
             sx={{
               borderTop: "1px solid",
               borderColor: "divider",
@@ -204,16 +305,17 @@ export default function ChatHeroBot({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={placeholder}
+              placeholder={isLoading ? "Waiting for response..." : placeholder}
               multiline
               maxRows={6}
               fullWidth
+              disabled={isLoading}
               InputProps={{
                 sx: { borderRadius: 999 },
                 startAdornment: (
                   <InputAdornment position="start">
                     <Tooltip title="Attach">
-                      <IconButton edge="start">
+                      <IconButton edge="start" disabled={isLoading}>
                         <AttachFileIcon />
                       </IconButton>
                     </Tooltip>
@@ -223,14 +325,21 @@ export default function ChatHeroBot({
                   <InputAdornment position="end">
                     <Tooltip title="Send">
                       <IconButton
+                        type="submit"
                         sx={{
                           background: accent,
                           color: "#fff",
                           "&:hover": { opacity: 0.9 },
+                          minWidth: 48, // Ensure button is square
+                          minHeight: 48,
                         }}
-                        onClick={() => handleSend()}
+                        disabled={!input.trim() || isLoading}
                       >
-                        <SendIcon />
+                        {isLoading ? (
+                          <CircularProgress size={20} color="inherit" />
+                        ) : (
+                          <SendIcon />
+                        )}
                       </IconButton>
                     </Tooltip>
                   </InputAdornment>
@@ -239,7 +348,12 @@ export default function ChatHeroBot({
             />
             <Typography
               variant="caption"
-              sx={{ mt: 0.75, display: "block", color: "text.secondary", textAlign: "center" }}
+              sx={{
+                mt: 0.75,
+                display: "block",
+                color: "text.secondary",
+                textAlign: "center",
+              }}
             >
               Press Enter to send · Shift+Enter for newline
             </Typography>
@@ -250,26 +364,21 @@ export default function ChatHeroBot({
   );
 }
 
-/* ── Conversation Logic ── */
-function computeReply({ text, phase, userName }) {
-  const s = text.trim();
+// Removed unnecessary helper functions (makeMsg, withIds) and
+// custom logic (computeReply, TypingDots) as they are not needed by the UI.
+// The remaining helper components (BotCard, UserPill) are now internal to the main function
+// or need to be moved out if they cause issues.
+// I moved them out for safety, and simplified the implementation slightly.
 
-  if (phase === "ask_name") {
-    const cleaned = s.replace(/[^a-z\s'-]/gi, "").trim();
-    const name = cleaned || "there";
-    return {
-      text: `Nice to meet you, ${name}!`,
-      next: { phase: "done", userName: cleaned || userName },
-    };
-  }
-
-  return null;
-}
-
-/* ── UI Pieces ── */
-function BotCard({ text, accent }) {
+/* ── UI Pieces (Moved outside for cleaner export) ── */
+function BotCard({ text, accent, isLoading }) {
   return (
-    <Stack direction="row" spacing={1.5} alignItems="flex-start" sx={{ pl: 0.5 }}>
+    <Stack
+      direction="row"
+      spacing={1.5}
+      alignItems="flex-start"
+      sx={{ pl: 0.5 }}
+    >
       {/* Bot icon with gradient */}
       <Box
         sx={{
@@ -283,7 +392,9 @@ function BotCard({ text, accent }) {
           boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
         }}
       >
-        <Avatar sx={{ bgcolor: "#fff", width: 32, height: 32, color: "text.primary" }}>
+        <Avatar
+          sx={{ bgcolor: "#fff", width: 32, height: 32, color: "text.primary" }}
+        >
           <SmartToyRoundedIcon fontSize="inherit" />
         </Avatar>
       </Box>
@@ -300,8 +411,11 @@ function BotCard({ text, accent }) {
           mt: -0.25,
         }}
       >
-        <Typography variant="body1" sx={{ whiteSpace: "pre-wrap", fontWeight: 600 }}>
-          {typeof text === "string" ? text : text}
+        <Typography
+          variant="body1"
+          sx={{ whiteSpace: "pre-wrap", fontWeight: 600 }}
+        >
+          {text}
         </Typography>
       </Paper>
     </Stack>
@@ -327,45 +441,4 @@ function UserPill({ text }) {
       </Paper>
     </Box>
   );
-}
-
-function TypingDots() {
-  return (
-    <Box sx={{ display: "inline-flex", gap: 0.6, alignItems: "center" }}>
-      {[0, 1, 2].map((i) => (
-        <Box
-          key={i}
-          sx={{
-            width: 8,
-            height: 8,
-            borderRadius: "50%",
-            backgroundColor: "text.secondary",
-            opacity: 0.6,
-            animation: "blink 1.2s infinite",
-            animationDelay: `${i * 0.15}s`,
-            "@keyframes blink": {
-              "0%, 80%, 100%": { opacity: 0.3, transform: "translateY(0)" },
-              "40%": { opacity: 1, transform: "translateY(-2px)" },
-            },
-          }}
-        />
-      ))}
-    </Box>
-  );
-}
-
-/* ── Helpers ── */
-function withIds(initial) {
-  return initial.map((m, i) => ({
-    id: m.id ?? `init-${i}`,
-    role: m.role ?? "bot",
-    text: m.text ?? "",
-  }));
-}
-function makeMsg(role, text) {
-  return {
-    id: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Math.random()),
-    role,
-    text,
-  };
 }

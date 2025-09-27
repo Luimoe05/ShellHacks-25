@@ -30,7 +30,7 @@ export default function HomepageNavbar() {
           <Button color="inherit" sx={{ color: "#64748b" }}>
             Pricing
           </Button>
-          <Button color="inherit" sx={{ color: "#64748b" }}>
+          <Button color="inherit" sx={{ color: "#64748b" }} >
             About
           </Button>
           <Button color="inherit" sx={{ color: "#64748b" }}>
