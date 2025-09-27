@@ -1,7 +1,6 @@
-require("dotenv").config();
-
-const express = require("express");
-const { auth } = require("express-openid-connect");
+import pkg from "express-openid-connect";
+const { auth } = pkg;
+import "dotenv/config";
 
 const config = {
   authRequired: false,
@@ -13,4 +12,4 @@ const config = {
   issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
 };
 
-module.exports = auth(config);
+export default auth(config);

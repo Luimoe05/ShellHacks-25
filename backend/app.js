@@ -1,14 +1,16 @@
-const express = require("express");
+import express from "express";
+import cors from "cors";
+import "dotenv/config";
+import { getAiExplanation } from "./gemini-service.js";
+
 const app = express();
-const cors = require("cors");
-require("dotenv").config();
 
 // CORS + JSON
 app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(express.json());
 
 // Middleware
-const authMiddleware = require("./Middleware/authentication");
+import authMiddleware from "./Middleware/authentication.js";
 app.use(authMiddleware);
 
 // Homepage
@@ -21,7 +23,10 @@ app.get("/", (req, res) => {
 });
 
 // Routes (only require once!)
-const profileRoute = require("./routes/profile.js");
+import profileRoute from "./routes/profile.js";
+import geminiRoute from "./routes/gemini.js";
+
+app.use("/gemini", geminiRoute);
 app.use("/profile", profileRoute);
 
 const PORT = process.env.PORT;
