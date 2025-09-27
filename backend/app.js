@@ -20,7 +20,13 @@ app.get("/", (req, res) => {
 
 app.get("/gemini", async (req, res) => {
   try {
-    const prompt = "Explain how AI works in a few words";
+    const userInput = req.query.text;
+    console.log(userInput);
+
+    const prompt = userInput || "Explain in a sentence how LLM's work";
+
+    console.log(`Sending the prompt to backend ${prompt}`);
+
     const explanation = await getAiExplanation(prompt);
     console.log(explanation);
     // Send the actual data back to the client
