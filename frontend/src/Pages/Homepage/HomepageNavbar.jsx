@@ -32,7 +32,7 @@ export default function HomepageNavbar({ isAuthenticated, userInfo }) {
           <Button color="inherit" sx={{ color: "#64748b" }}>
             Pricing
           </Button>
-          <Button color="inherit" sx={{ color: "#64748b" }} >
+          <Button color="inherit" sx={{ color: "#64748b" }}>
             About
           </Button>
           <Button color="inherit" sx={{ color: "#64748b" }}>
@@ -68,7 +68,15 @@ export default function HomepageNavbar({ isAuthenticated, userInfo }) {
               >
                 Sign In
               </Button>
-              <Button variant="contained" sx={{ bgcolor: "#54B888" }}>
+              <Button
+                variant="contained"
+                sx={{ bgcolor: "#54B888" }}
+                onClick={() =>
+                  (window.location.href = `${
+                    import.meta.env.VITE_BACKEND_URL
+                  }/login`)
+                }
+              >
                 Get Started
               </Button>
             </>
