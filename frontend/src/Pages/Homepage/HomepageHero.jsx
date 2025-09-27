@@ -1,7 +1,10 @@
 import React from "react";
 import { Box, Typography, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-export default function HomepageHero() {
+export default function HomepageHero({ isAuthenticated }) {
+  const navigate = useNavigate();
+
   return (
     <Box sx={{ py: 8, textAlign: "center" }}>
       <Typography
@@ -23,7 +26,7 @@ export default function HomepageHero() {
         variant="h5"
         sx={{
           mb: 4,
-          color: "#64748b",
+          color: "white",
           fontWeight: 400,
           maxWidth: "600px",
           mx: "auto",
@@ -41,6 +44,20 @@ export default function HomepageHero() {
         }}
       >
         <Button
+          onClick={
+            // 1. Condition
+            !isAuthenticated
+              ? // 2. Value if TRUE (User NOT authenticated -> Login Redirect Handler)
+                () => {
+                  window.location.href = `${
+                    import.meta.env.VITE_BACKEND_URL
+                  }/login`;
+                }
+              : // 3. Value if FALSE (User IS authenticated -> Gemini Handler)
+                () => {
+                  navigate("/gemini");
+                }
+          }
           variant="contained"
           size="large"
           sx={{
@@ -53,6 +70,7 @@ export default function HomepageHero() {
         >
           Try Moola
         </Button>
+
         <Button
           variant="outlined"
           size="large"
