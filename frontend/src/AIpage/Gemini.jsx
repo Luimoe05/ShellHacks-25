@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 // FIX: Using the standard relative path: one folder up (..) and into the Components folder
-import ChatHeroBot from "./chatboxpage.jsx";
+import ChatHeroBot from "./Chatbox/chatboxpage.jsx";
+import { Container } from "@mui/material";
 
 // IMPORTANT: Please verify and replace '3000' with the actual port
 const BACKEND_URL = "http://localhost:3000/gemini";
@@ -25,9 +26,9 @@ export default function Gemini() {
   const messagesEndRef = useRef(null);
 
   // Scroll to the bottom of the chat on new message
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  // useEffect(() => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [messages]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -104,6 +105,7 @@ export default function Gemini() {
 
   return (
     // Pass all necessary state and handlers to the ChatHeroBot UI component
+
     <ChatHeroBot
       messages={messages}
       input={input}

@@ -46,9 +46,10 @@ export default function ChatHeroBot({
     () =>
       createTheme({
         palette: {
-          mode: "light",
+          mode: "dark", // <--- Switched to Dark Mode
           primary: { main: "#2E8BC0" },
-          background: { default: "#ffffff", paper: "#ffffff" },
+          // Set custom dark grey backgrounds
+          background: { default: "#121212", paper: "#1E1E1E" },
         },
         shape: { borderRadius: 28 },
         typography: {
@@ -96,12 +97,13 @@ export default function ChatHeroBot({
             display: "grid",
             placeItems: "center",
             flexShrink: 0,
-            boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+            // Changed to a subtle white shadow for dark mode
+            boxShadow: "0 4px 16px rgba(255, 255, 255, 0.05)",
           }}
         >
           <Avatar
             sx={{
-              bgcolor: "#fff",
+              bgcolor: "#121212",
               width: 32,
               height: 32,
               color: "text.primary",
@@ -111,15 +113,16 @@ export default function ChatHeroBot({
           </Avatar>
         </Box>
 
-        {/* White card bubble */}
+        {/* Card bubble (will be dark grey from theme.palette.background.paper) */}
         <Paper
           elevation={6}
           sx={{
             px: { xs: 2, sm: 2.4 },
             py: { xs: 1.8, sm: 2.2 },
             borderRadius: 5,
+            // Changed to a subtle white shadow for dark mode
             boxShadow:
-              "0 10px 28px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.06)",
+              "0 10px 28px rgba(255,255,255,0.05), 0 2px 6px rgba(255,255,255,0.03)",
             maxWidth: 620,
             mt: -0.25,
           }}
@@ -156,8 +159,9 @@ export default function ChatHeroBot({
             py: { xs: 1.2, sm: 1.4 },
             borderRadius: 999,
             fontWeight: 700,
+            // Changed to a subtle white shadow for dark mode
             boxShadow:
-              "0 12px 26px rgba(0,0,0,0.12), 0 3px 8px rgba(0,0,0,0.06)",
+              "0 12px 26px rgba(255,255,255,0.05), 0 3px 8px rgba(255,255,255,0.03)",
           }}
         >
           <Typography variant="subtitle1">{text}</Typography>
@@ -177,14 +181,16 @@ export default function ChatHeroBot({
           width: "100%",
           maxWidth: 920,
           mx: "auto",
-          minHeight: "100vh",
+          minHeight: "80vh",
           display: "flex",
           flexDirection: "column",
 
           p: 3,
-          borderRadius: 2, // ← rectangular, slightly curved edges
+          m: 3,
+          borderRadius: 1, // ← rectangular, slightly curved edges
           border: "4px solid transparent",
-          backgroundImage: `linear-gradient(#fff, #fff), ${accent}`,
+          // Background for the border wrapper is set to dark grey
+          backgroundImage: `linear-gradient(#121212, #121212), ${accent}`,
           backgroundOrigin: "padding-box, border-box",
           backgroundClip: "padding-box, border-box",
           boxShadow: "0 16px 32px rgba(0,0,0,0.08)",
@@ -225,6 +231,7 @@ export default function ChatHeroBot({
                 fontSize: { xs: 34, sm: 54 },
                 lineHeight: 1.15,
                 m: 0,
+                color: "white",
               }}
             >
               Meet Our AI
@@ -237,6 +244,7 @@ export default function ChatHeroBot({
                 lineHeight: 1.15,
                 mt: 0.25,
                 m: 0,
+                color: "white",
               }}
             >
               Coach{" "}
@@ -257,8 +265,8 @@ export default function ChatHeroBot({
         {/* Chat container */}
         <Box
           sx={{
-            borderRadius: 3,
-            bgcolor: "#fff",
+            borderRadius: 1,
+            bgcolor: "#1E1E1E", // <--- Dark grey background
             display: "flex",
             flexDirection: "column",
             flex: 1,
@@ -270,6 +278,8 @@ export default function ChatHeroBot({
           <Stack
             ref={listRef}
             spacing={3}
+            // Using a slightly different shade to distinguish from the border box
+            bgcolor={"#1E1E1E"}
             sx={{
               flex: 1,
               overflowY: "auto",
@@ -295,10 +305,11 @@ export default function ChatHeroBot({
             onSubmit={sendMessage} // Use the parent's handler
             sx={{
               borderTop: "1px solid",
+              // `borderColor: "divider"` automatically picks a light color in dark mode
               borderColor: "divider",
               px: { xs: 1.75, sm: 2.25 },
               py: 1.25,
-              bgcolor: "#fff",
+              bgcolor: "#1E1E1E", // <--- Dark grey background
             }}
           >
             <TextField
@@ -328,7 +339,7 @@ export default function ChatHeroBot({
                         type="submit"
                         sx={{
                           background: accent,
-                          color: "#fff",
+                          color: "white",
                           "&:hover": { opacity: 0.9 },
                           minWidth: 48, // Ensure button is square
                           minHeight: 48,
@@ -351,7 +362,7 @@ export default function ChatHeroBot({
               sx={{
                 mt: 0.75,
                 display: "block",
-                color: "text.secondary",
+                color: "text.secondary", // This will be light grey in dark mode
                 textAlign: "center",
               }}
             >
@@ -389,7 +400,8 @@ function BotCard({ text, accent, isLoading }) {
           display: "grid",
           placeItems: "center",
           flexShrink: 0,
-          boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+          // Dark mode shadow fix
+          boxShadow: "0 4px 16px rgba(255,255,255,0.05)",
         }}
       >
         <Avatar
@@ -399,14 +411,16 @@ function BotCard({ text, accent, isLoading }) {
         </Avatar>
       </Box>
 
-      {/* White card bubble */}
+      {/* Card bubble (uses theme.palette.background.paper in dark mode) */}
       <Paper
         elevation={6}
         sx={{
           px: { xs: 2, sm: 2.4 },
           py: { xs: 1.8, sm: 2.2 },
           borderRadius: 5,
-          boxShadow: "0 10px 28px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.06)",
+          // Dark mode shadow fix
+          boxShadow:
+            "0 10px 28px rgba(255,255,255,0.05), 0 2px 6px rgba(255,255,255,0.03)",
           maxWidth: 620,
           mt: -0.25,
         }}
@@ -434,7 +448,9 @@ function UserPill({ text }) {
           py: { xs: 1.2, sm: 1.4 },
           borderRadius: 999,
           fontWeight: 700,
-          boxShadow: "0 12px 26px rgba(0,0,0,0.12), 0 3px 8px rgba(0,0,0,0.06)",
+          // Dark mode shadow fix
+          boxShadow:
+            "0 12px 26px rgba(255,255,255,0.05), 0 3px 8px rgba(255,255,255,0.03)",
         }}
       >
         <Typography variant="subtitle1">{text}</Typography>
