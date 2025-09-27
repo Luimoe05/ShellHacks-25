@@ -14,9 +14,11 @@ import authMiddleware from "./Middleware/authentication.js";
 app.use(authMiddleware);
 
 // Homepage
+
 app.get("/", (req, res) => {
   if (req.oidc.isAuthenticated()) {
     res.send(`Logged in as ${req.oidc.user.name} <a href="/logout">Logout</a>`);
+    res.redirect(process.env.FRONTEND_URL);
   } else {
     res.send(`Not logged in <a href="/login">Login</a>`);
   }
