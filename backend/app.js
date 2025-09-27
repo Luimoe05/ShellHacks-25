@@ -6,7 +6,13 @@ import { getAiExplanation } from "./gemini-service.js";
 const app = express();
 
 // CORS + JSON
-app.use(cors({ origin: process.env.FRONTEND_URL }));
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Middleware
@@ -17,8 +23,17 @@ app.use(authMiddleware);
 
 app.get("/", (req, res) => {
   if (req.oidc.isAuthenticated()) {
-    res.send(`Logged in as ${req.oidc.user.name} <a href="/logout">Logout</a>`);
-    res.redirect(process.env.FRONTEND_URL);
+    // Create URL with user data for React
+    const userData = {
+      name: req.oidc.user.name,
+      email: req.oidc.user.email,
+      picture: req.oidc.user.picture,
+      sub: req.oidc.user.sub,
+    };
+    const encodedUserData = encodeURIComponent(JSON.stringify(userData));
+    res.redirect(
+      `${process.env.FRONTEND_URL}?auth=true&user=${encodedUserData}`
+    );
   } else {
     res.send(`Not logged in <a href="/login">Login</a>`);
   }
@@ -27,9 +42,13 @@ app.get("/", (req, res) => {
 // Routes (only require once!)
 import profileRoute from "./routes/profile.js";
 import geminiRoute from "./routes/gemini.js";
+import authRoute from "./routes/auth.js";
 
 app.use("/gemini", geminiRoute);
 app.use("/profile", profileRoute);
+app.use("/auth", authRoute);
+
+console.log("Routes registered!"); // Debug log
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

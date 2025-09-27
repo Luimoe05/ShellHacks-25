@@ -1,3 +1,4 @@
+// Middleware/authentication.js
 import pkg from "express-openid-connect";
 const { auth } = pkg;
 import "dotenv/config";
@@ -10,7 +11,9 @@ const config = {
   clientID: process.env.AUTH0_CLIENT_ID,
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
   issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
-  response_mode: "query",
+  routes: {
+    postLogoutRedirect: process.env.FRONTEND_URL,
+  },
 };
 
 export default auth(config);
