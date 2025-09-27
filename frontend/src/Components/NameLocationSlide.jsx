@@ -1,5 +1,7 @@
+// NameLocationSlide.jsx
+
 import React from "react";
-import CustomizedSteppers from './CustomizedStepper';
+// Removed CustomizedSteppers import
 import {
   Box,
   TextField,
@@ -7,12 +9,11 @@ import {
   Select,
   MenuItem,
   FormControl,
-  Checkbox,
-  FormControlLabel,
-  Grid, 
 } from "@mui/material";
 
-export default function NameLocationSlide({ data, setData }) {
+// REMOVED Stepper-specific props (activeStep, handleNext, etc.) 
+// since the Stepper is no longer here.
+export default function NameLocationSlide({ data, setData }) { 
   const handleNoWebsiteCheck = (event) => {
     const isChecked = event.target.checked;
     setData({
@@ -33,20 +34,19 @@ export default function NameLocationSlide({ data, setData }) {
       display: "flex", 
       flexDirection: "column", 
       gap: 3, 
-      width: '100vw', 
-      minHeight: '100vh', 
       px: 8, 
       py: 5, 
       boxSizing: 'border-box',
+      ml: 50,
+      mt: 18,
     }}>
-      {/* --- Title and Subtitle --- */}
       <Typography 
         variant="h4" 
         sx={{ 
           fontWeight: 'bold', 
           textAlign: 'left', 
           width: '100%',
-          mt: 3,
+          mt: 1,
         }}
       >
         Tell us more about yourself
@@ -57,15 +57,17 @@ export default function NameLocationSlide({ data, setData }) {
           textAlign: 'left', 
           color: 'gray', 
           opacity: 1.0, 
+          mt: -2,
+          mb: -1,
         }}
       >
         Get customized recommendations from our AI financial coach, Moola!
       </Typography>
       
       {/* --- Name and Country/Region Section --- */}
-      <Box sx={{ width: '37%' }}>
+      <Box sx={{ width: '52%' }}>
         {/* 1. Your Name Field */}
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 0.5, textAlign: 'left' }}>
+        <Typography variant="subtitle1" sx={{fontWeight: 'bold', mb: 0.5, textAlign: 'left' }}>
           Your Name <span style={{ color: 'gray' }}>ⓘ</span>
         </Typography>
         <TextField
@@ -121,9 +123,8 @@ export default function NameLocationSlide({ data, setData }) {
         </Box>
       </Box>
       
-      <Box sx={{ width: '38%', display: 'flex', justifyContent: 'center', mt: 1 }}>
-        <CustomizedSteppers />
-      </Box>
+      {/* DELETED: The Stepper was here. Now it's in OnboardingStepper.jsx */}
+      
     </Box>
   );
 }
