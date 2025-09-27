@@ -48,7 +48,7 @@ export default function HomepageFeatures({ featuresData = features }) {
           textAlign: "center",
           mb: 2,
           fontWeight: 700,
-          color: "#1e293b",
+          color: "white",
         }}
       >
         Why Choose Moola?
@@ -58,7 +58,7 @@ export default function HomepageFeatures({ featuresData = features }) {
         sx={{
           textAlign: "center",
           mb: 6,
-          color: "#64748b",
+          color: "white",
           maxWidth: "600px",
           mx: "auto",
         }}
@@ -82,11 +82,16 @@ export default function HomepageFeatures({ featuresData = features }) {
                 height: "100%",
                 p: 2,
                 borderRadius: 3,
+                bgcolor: "#121212",
                 transition: "transform 0.2s ease-in-out",
                 "&:hover": {
                   transform: "translateY(-4px)",
-                  boxShadow: 4,
+                  boxShadow:
+                    "0 8px 16px rgba(255, 255, 255, 0.15), 0 0 10px rgba(255, 255, 255, 0.05)",
+                  cursor: "pointer",
                 },
+                // OPTIONAL: Apply a very subtle light shadow even when not hovered
+                boxShadow: "0 2px 8px rgba(255, 255, 255, 0.1)",
               }}
             >
               <CardContent>
@@ -110,11 +115,11 @@ export default function HomepageFeatures({ featuresData = features }) {
                   <Box>
                     <Typography
                       variant="h6"
-                      sx={{ fontWeight: 600, mb: 1, color: "#1e293b" }}
+                      sx={{ fontWeight: 600, mb: 1, color: "white" }}
                     >
                       {feature.title}
                     </Typography>
-                    <Typography variant="body1" sx={{ color: "#64748b" }}>
+                    <Typography variant="body1" sx={{ color: "white" }}>
                       {feature.description}
                     </Typography>
                   </Box>
