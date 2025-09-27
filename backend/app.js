@@ -1,45 +1,54 @@
-// OLD: const express = require("express");
 import express from "express";
-
-// OLD: const cors = require("cors");
 import cors from "cors";
-
-// OLD: require("dotenv").config();
 import "dotenv/config";
 import { getAiExplanation } from "./gemini-service.js";
 
 const app = express();
 
-// Middleware to parse JSON
-app.use(cors({ origin: process.env.FRONTEND_URL }));
+// CORS + JSON
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 app.use(express.json());
 
+// Middleware
+import authMiddleware from "./Middleware/authentication.js";
+app.use(authMiddleware);
+
+// Homepage
+
 app.get("/", (req, res) => {
-  res.json({ message: "Server is running" });
-});
-
-app.get("/gemini", async (req, res) => {
-  try {
-    const userInput = req.query.text;
-    console.log(userInput);
-
-    const prompt = userInput || "Explain in a sentence how LLM's work";
-
-    console.log(`Sending the prompt to backend ${prompt}`);
-
-    const explanation = await getAiExplanation(prompt);
-    console.log(explanation);
-    // Send the actual data back to the client
-    res.json({ success: true, explanation: explanation });
-  } catch (error) {
-    // Error handling from the service layer
-    console.error(error.message);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+  if (req.oidc.isAuthenticated()) {
+    // Create URL with user data for React
+    const userData = {
+      name: req.oidc.user.name,
+      email: req.oidc.user.email,
+      picture: req.oidc.user.picture,
+      sub: req.oidc.user.sub,
+    };
+    const encodedUserData = encodeURIComponent(JSON.stringify(userData));
+    res.redirect(
+      `${process.env.FRONTEND_URL}?auth=true&user=${encodedUserData}`
+    );
+  } else {
+    res.send(`Not logged in <a href="/login">Login</a>`);
   }
 });
+
+// Routes (only require once!)
+import profileRoute from "./routes/profile.js";
+import geminiRoute from "./routes/gemini.js";
+import authRoute from "./routes/auth.js";
+
+app.use("/gemini", geminiRoute);
+app.use("/profile", profileRoute);
+app.use("/auth", authRoute);
+
+console.log("Routes registered!"); // Debug log
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

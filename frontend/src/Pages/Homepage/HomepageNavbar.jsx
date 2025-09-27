@@ -9,7 +9,8 @@ import {
 } from "@mui/material";
 import { AccountBalance, Menu } from "@mui/icons-material";
 
-export default function HomepageNavbar() {
+export default function HomepageNavbar({ isAuthenticated, userInfo }) {
+  console.log("Navbar - isAuthenticated:", isAuthenticated);
   return (
     <AppBar position="static" sx={{ bgcolor: "white", boxShadow: 1 }}>
       <Toolbar>
@@ -23,6 +24,7 @@ export default function HomepageNavbar() {
             Moola
           </Typography>
         </Box>
+
         <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
           <Button color="inherit" sx={{ color: "#64748b" }}>
             Features
@@ -37,17 +39,42 @@ export default function HomepageNavbar() {
             Contact
           </Button>
         </Box>
+
         <Box sx={{ display: { xs: "none", md: "flex" }, ml: 3, gap: 3 }}>
-          <Button
-            variant="outlined"
-            sx={{ color: "#54B888", borderColor: "#54B888" }}
-          >
-            Sign In
-          </Button>
-          <Button variant="contained" sx={{ bgcolor: "#54B888" }}>
-            Get Started
-          </Button>
+          {isAuthenticated ? (
+            <Button
+              variant="outlined"
+              sx={{ color: "#ff6b6b", borderColor: "#ff6b6b" }}
+              onClick={() => {
+                localStorage.removeItem("isAuthenticated");
+                localStorage.removeItem("userInfo");
+                window.location.href = `${
+                  import.meta.env.VITE_BACKEND_URL
+                }/logout`;
+              }}
+            >
+              Logout
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="outlined"
+                sx={{ color: "#54B888", borderColor: "#54B888" }}
+                onClick={() =>
+                  (window.location.href = `${
+                    import.meta.env.VITE_BACKEND_URL
+                  }/login`)
+                }
+              >
+                Sign In
+              </Button>
+              <Button variant="contained" sx={{ bgcolor: "#54B888" }}>
+                Get Started
+              </Button>
+            </>
+          )}
         </Box>
+
         <IconButton
           sx={{ display: { xs: "flex", md: "none" }, color: "#64748b" }}
         >

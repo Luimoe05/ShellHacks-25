@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react"; // Add useState and useEffect
 import {
   AppBar,
   Toolbar,
@@ -13,7 +13,7 @@ import {
   Paper,
   Chip,
   Avatar,
-  GlobalStyles, // <-- NEW IMPORT
+  GlobalStyles,
 } from "@mui/material";
 import {
   TrendingUp,
@@ -26,7 +26,6 @@ import {
   Analytics,
   Wallet,
 } from "@mui/icons-material";
-
 import HomepageNavbar from "./HomepageNavbar";
 import Footer from "../Footer";
 import HomepageHero from "./HomepageHero";
@@ -35,6 +34,31 @@ import HomepageFeatures from "./HomepageFeatures";
 import HomepageCTA from "./HomepageCTA";
 
 export default function FinancialAppHomepage() {
+  // Add authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Check authentication status
+  useEffect(() => {
+    console.log("localStorage auth:", localStorage.getItem("isAuthenticated"));
+    console.log("localStorage user:", localStorage.getItem("userInfo"));
+
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/status`, {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setIsAuthenticated(data.isAuthenticated);
+        setUserInfo(data.user);
+        setLoading(false);
+      })
+      .catch(() => {
+        setIsAuthenticated(false);
+        setLoading(false);
+      });
+  }, []);
+
   const features = [
     {
       icon: <TrendingUp sx={{ fontSize: 40, color: "#1976d2" }} />,
@@ -69,16 +93,25 @@ export default function FinancialAppHomepage() {
     { label: "Uptime", value: "99.9%" },
   ];
 
+  // Show loading while checking auth
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        Loading...
+      </Box>
+    );
+  }
+
   return (
     <>
-      {/* GLOBAL CSS RESET: Removes default browser margins/padding */}
+      {/* GLOBAL CSS RESET */}
       <GlobalStyles
         styles={{
           body: {
             margin: 0,
             padding: 0,
-            overflowX: "hidden", // Prevents horizontal scroll from viewport width issues
-            backgroundColor: "#FFFFFF", // Matches the outer box for seamless color transition
+            overflowX: "hidden",
+            backgroundColor: "#FFFFFF",
           },
           html: {
             height: "100%",
@@ -94,8 +127,8 @@ export default function FinancialAppHomepage() {
           width: "100vw",
         }}
       >
-        {/* Header */}
-        <HomepageNavbar />
+        {/* Header - Pass isAuthenticated to navbar if needed */}
+        <HomepageNavbar isAuthenticated={isAuthenticated} userInfo={userInfo} />
 
         {/* Hero Section */}
         <Container maxWidth="lg">
