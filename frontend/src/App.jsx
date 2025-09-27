@@ -1,4 +1,6 @@
 import { useState } from "react";
+import {BrowserRouter as Router, Routes, Route, Link} from "react-router-dom"
+import OboardingStepper from "./Components/OnboardingStepper.jsx";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 import "./App.css";
@@ -11,6 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/gemini" element={<Gemini />} />
+        <Route path="/onboarding" element={<OboardingStepper />} />
       </Routes>
     </Router>
   );
