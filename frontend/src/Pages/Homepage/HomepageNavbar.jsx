@@ -8,14 +8,15 @@ import {
   IconButton,
 } from "@mui/material";
 import { AccountBalance, Menu } from "@mui/icons-material";
-import Profile from "../Profile/Profile";
+import { useNavigate } from "react-router-dom";
 export default function HomepageNavbar({ isAuthenticated, userInfo }) {
+  const navigate = useNavigate();
   console.log("Navbar - isAuthenticated:", isAuthenticated);
   return (
     <AppBar position="static" sx={{ bgcolor: "#121212", boxShadow: 1 }}>
       <Toolbar>
-        <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-          <AccountBalance sx={{ color: "white", mr: 1, fontSize: 28 }} />
+        <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1, cursor: "pointer" }} onClick={() => navigate("/")}>
+          <AccountBalance sx={{ color: "white", mr: 1, fontSize: 28 }}/>
           <Typography
             variant="h6"
             component="div"
@@ -32,7 +33,7 @@ export default function HomepageNavbar({ isAuthenticated, userInfo }) {
           <Button color="inherit" sx={{ color: "white" }}>
             Pricing
           </Button>
-          <Button color="inherit" sx={{ color: "white" }}>
+          <Button color="inherit" sx={{ color: "white" }} onClick={() => navigate('/about')}>
             About
           </Button>
           <Button color="inherit" sx={{ color: "white" }}>

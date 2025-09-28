@@ -8,6 +8,7 @@ import AIPage from "./AIpage/AIPage.jsx";
 import OnboardingStepper from "./Components/OnboardingStepper.jsx";
 import Profile from "./Pages/Profile/Profile.jsx";
 import Footer from "./Pages/Footer.jsx";
+import About from "./Pages/About.jsx";
 function App() {
   return (
     <Router>
@@ -16,6 +17,7 @@ function App() {
         <Route path="/gemini" element={<AIPage />} />
         <Route path="/onboarding" element={<OnboardingStepper />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/about" element={<About />} />
       </Routes>
     </Router>
   );
