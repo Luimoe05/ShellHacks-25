@@ -1,9 +1,16 @@
+// OnboardingStepper.jsx
+
 import React, { useState } from "react";
-import { Box, Stepper, Step, Button } from "@mui/material";
+import { Box } from "@mui/material"; 
 import NameLocationSlide from "./NameLocationSlide";
+import InterestsSlide from "./InterestsSlide";
+import FinancialUserInputSlide from "./FinancialUserInputSlide";
+import CustomizedSteppers from "./CustomizedStepper"; 
+import BackgroundSlideWrapper from "./BackgroundSlideWrapper";
+import SlidersNavbar from "./SlidersNavbar";
 
 export default function OnboardingStepper() {
-  const steps = ["Your Info", "Interests", "Goals", "Financials"];
+  const steps = ["Your Info", "Interests", "Financials"];
   const [activeStep, setActiveStep] = useState(0);
 
   const [formData, setFormData] = useState({
@@ -17,16 +24,12 @@ export default function OnboardingStepper() {
     file: null,
   });
 
-  const slides = [
-    <NameLocationSlide data={formData} setData={setFormData} />,
-  ];
-
   const handleNext = () => {
-    if (activeStep < slides.length - 1) {
+    if (activeStep < steps.length - 1) { 
       setActiveStep((prev) => prev + 1);
     } else {
       console.log("Final Data:", formData);
-      // we need to submit formData to backend once user hits next
+      // Logic for final form submission goes here
     }
   };
 
@@ -34,26 +37,41 @@ export default function OnboardingStepper() {
     if (activeStep > 0) setActiveStep((prev) => prev - 1);
   };
 
+  const formSlideProps = {
+    data: formData,
+    setData: setFormData,
+  };
+
+  const slides = [
+    <NameLocationSlide {...formSlideProps} />,
+    <InterestsSlide {...formSlideProps} />,
+    <FinancialUserInputSlide {...formSlideProps} />,
+  ];
+
   return (
-    <Box sx={{ width: "50%", mx: "auto", mt: 8 }}>
-      <Box sx={{ mb: 2 }}>{slides[activeStep]}</Box>
-
-      <Stepper activeStep={activeStep} sx={{ mt: 2 }}>
-        {steps.map((label) => (
-          <Step key={label}>
-            <Box>{label}</Box>
-          </Step>
-        ))}
-      </Stepper>
-
-      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-        <Button disabled={activeStep === 0} onClick={handleBack}>
-          Back
-        </Button>
-        <Button variant="contained" onClick={handleNext}>
-          {activeStep === steps.length - 1 ? "Finish" : "Next"}
-        </Button>
-      </Box>
-    </Box>
+    <SlidersNavbar>
+      <BackgroundSlideWrapper>
+        <Box sx={{ width: "100%", mx: "auto", pt:0.5 }}>
+          {/* 1. Renders the content that CHANGES */}
+          <Box sx={{ mb: 2 }}>{slides[activeStep]}</Box>
+          
+          {/* 2. Renders the Stepper (and its buttons) that STAYS */}
+          <Box sx={{ 
+              width: '35%', 
+              display: 'flex', 
+              justifyContent: 'center',
+              ml: 62,
+              mt:-5,
+          }}>
+            <CustomizedSteppers 
+              activeStep={activeStep}
+              handleNext={handleNext}
+              handleBack={handleBack}
+              steps={steps} 
+            />
+          </Box>
+        </Box>
+      </BackgroundSlideWrapper>
+    </SlidersNavbar>
   );
 }

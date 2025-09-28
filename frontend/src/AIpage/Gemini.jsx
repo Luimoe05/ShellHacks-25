@@ -1,10 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
-import ChatHeroBot from "./chatboxpage.jsx";
-
+// FIX: Using the standard relative path: one folder up (..) and into the Components folder
+import ChatHeroBot from "./Chatbox/chatboxpage.jsx";
+import { Container } from "@mui/material";
+// IMPORTANT: Please verify and replace '3000' with the actual port
 const BACKEND_URL = "http://localhost:3000/gemini";
 const USER_ID = "User";
 const AI_ID = "Gemini";
 
+/**
+ * Gemini component handles all chat state, logic, and API calls,
+ * passing data and handlers down to the ChatHeroBot UI component.
+ */
 export default function Gemini() {
   const [messages, setMessages] = useState([
     {
@@ -16,17 +22,21 @@ export default function Gemini() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+
+  // NEW: Add conversation history state for database saving
   const [conversationHistory, setConversationHistory] = useState([]);
 
+  // NEW: Get user info from URL params (for Auth0 integration)
   const urlParams = new URLSearchParams(window.location.search);
   const userParam = urlParams.get("user");
   const user = userParam ? JSON.parse(decodeURIComponent(userParam)) : null;
 
+  // Scroll to the bottom of the chat on new message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Save conversation to database on page unload/refresh
+  // NEW: Save conversation to database on page unload/refresh
   useEffect(() => {
     const saveConversation = async () => {
       if (conversationHistory.length > 0 && user?.sub) {
@@ -57,19 +67,22 @@ export default function Gemini() {
     const userMessageText = input.trim();
     if (!userMessageText || isLoading) return;
 
+    // NEW: Get auth0 user ID for database operations
     const auth0UserId = user?.sub;
 
-    // Add user message to UI
+    // 1. Add user message to state
     const newUserMessage = {
       id: Date.now(),
       sender: USER_ID,
       text: userMessageText,
     };
     setMessages((prev) => [...prev, newUserMessage]);
-    setInput("");
-    setIsLoading(true);
 
-    // Add loading message
+    // Reset input immediately
+    setInput("");
+    setIsLoading(true); // START LOADING
+
+    // 2. Add temporary loading message for the AI response
     const tempAiId = Date.now() + 1;
     setMessages((prev) => [
       ...prev,
@@ -77,7 +90,7 @@ export default function Gemini() {
     ]);
 
     try {
-      // Send request with conversation history for context
+      // MODIFIED: Send POST request with conversation history for context
       const response = await fetch(BACKEND_URL, {
         method: "POST",
         headers: {
@@ -95,12 +108,14 @@ export default function Gemini() {
       }
 
       const data = await response.json();
-      console.log("DATA RECEIVED FROM BACKEND:", data);
+      // Log the data to the browser console
+      console.log("✅ DATA RECEIVED FROM BACKEND (Browser Console):", data);
 
       const aiResponseText =
-        data.explanation || "Error: No explanation received";
+        data.explanation ||
+        "Error: Explanation field missing in response. Check the Network tab.";
 
-      // Update conversation history with both user and AI messages
+      // NEW: Update conversation history with both user and AI messages
       const newHistory = [
         ...conversationHistory,
         {
@@ -116,93 +131,46 @@ export default function Gemini() {
       ];
       setConversationHistory(newHistory);
 
-      // Update UI with AI response
+      // 4. Update the temporary loading message with the actual AI response
       setMessages((prev) => {
-        return prev.map((msg) =>
+        // Find and replace the temporary 'Generating response...' message
+        const newMessages = prev.map((msg) =>
           msg.id === tempAiId ? { ...msg, text: aiResponseText } : msg
         );
+        return newMessages;
       });
     } catch (error) {
-      console.error("Error fetching AI response:", error);
+      console.error("❌ Error fetching AI response (Browser Console):", error);
+      // 5. Update the temporary message with an error
       setMessages((prev) => {
-        return prev.map((msg) =>
+        const newMessages = prev.map((msg) =>
           msg.id === tempAiId
             ? {
                 ...msg,
-                text: `[Error] Failed to connect: ${error.message}`,
+                text: `[Error] Failed to connect: ${error.message}. Check your backend port and CORS.`,
               }
             : msg
         );
+        return newMessages;
       });
     } finally {
+      // 6. STOP LOADING
+      console.log("Setting isLoading to false in finally block.");
       setIsLoading(false);
     }
   };
 
-  // Function to manually save conversation
-  const saveConversationNow = async () => {
-    if (conversationHistory.length > 0 && user?.sub) {
-      try {
-        const response = await fetch(`${BACKEND_URL}/save-conversation`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: user.sub,
-            conversation: conversationHistory,
-          }),
-        });
-
-        if (response.ok) {
-          console.log("Conversation saved manually");
-        }
-      } catch (error) {
-        console.error("Error saving conversation:", error);
-      }
-    }
-  };
-
-  // Function to start new conversation
-  const startNewConversation = () => {
-    setConversationHistory([]);
-    setMessages([
-      {
-        id: 1,
-        sender: AI_ID,
-        text: "Welcome! Type any message and click 'Send' to receive a response.",
-      },
-    ]);
-  };
-
   return (
-    <div>
-      <div
-        style={{
-          padding: "10px",
-          background: "#f5f5f5",
-          borderBottom: "1px solid #ddd",
-        }}
-      >
-        <button onClick={startNewConversation} style={{ marginRight: "10px" }}>
-          New Conversation
-        </button>
-        <button onClick={saveConversationNow}>Save Conversation</button>
-        <span style={{ marginLeft: "10px", fontSize: "12px", color: "#666" }}>
-          Messages: {conversationHistory.length}
-        </span>
-      </div>
-
-      <ChatHeroBot
-        messages={messages}
-        input={input}
-        setInput={setInput}
-        sendMessage={sendMessage}
-        isLoading={isLoading}
-        messagesEndRef={messagesEndRef}
-        USER_ID={USER_ID}
-        AI_ID={AI_ID}
-      />
-    </div>
+    // Pass all necessary state and handlers to the ChatHeroBot UI component
+    <ChatHeroBot
+      messages={messages}
+      input={input}
+      setInput={setInput}
+      sendMessage={sendMessage}
+      isLoading={isLoading}
+      messagesEndRef={messagesEndRef}
+      USER_ID={USER_ID}
+      AI_ID={AI_ID}
+    />
   );
 }

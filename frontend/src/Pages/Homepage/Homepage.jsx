@@ -38,10 +38,14 @@ export default function FinancialAppHomepage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // --- NEW: State to track cursor position for the background glow (REINTRODUCED) ---
+  const [glowPosition, setGlowPosition] = useState({ x: 0, y: 0 });
   const [dbConnected, setDbConnected] = useState(false);
 
   // Check authentication status
   useEffect(() => {
+    // Authentication logic remains the same
     console.log("localStorage auth:", localStorage.getItem("isAuthenticated"));
     console.log("localStorage user:", localStorage.getItem("userInfo"));
 
@@ -62,25 +66,6 @@ export default function FinancialAppHomepage() {
         setLoading(false);
       });
   }, []);
-
-  const testSupabaseConnection = async () => {
-    try {
-      const { data, error } = await supabase.from("UserInfo").select("*"); // Remove limit and get data
-
-      if (error) {
-        console.log("❌ Database NOT Connected:", error.message);
-        setDbConnected(false);
-      } else {
-        console.log("✅ Database Connected Successfully!");
-        console.log("📊 All users in UserInfo table:", data);
-        console.log("👥 Total users:", data.length);
-        setDbConnected(true);
-      }
-    } catch (err) {
-      console.log("❌ Database Connection Failed:", err.message);
-      setDbConnected(false);
-    }
-  };
 
   const features = [
     {
@@ -134,7 +119,7 @@ export default function FinancialAppHomepage() {
             margin: 0,
             padding: 0,
             overflowX: "hidden",
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "#000000",
           },
           html: {
             height: "100%",
@@ -145,23 +130,46 @@ export default function FinancialAppHomepage() {
       <Box
         sx={{
           flexGrow: 1,
-          bgcolor: "#FFFFFF",
+          bgcolor: "#121212",
           minHeight: "100vh",
           width: "100vw",
+          position: "relative", // Required for positioning the animation layer
+          overflow: "hidden", // Ensures the large glow doesn't create scrollbars
+          zIndex: 1, // Ensure all content is above the glow layer (which will be zIndex: 0)
         }}
       >
-        {/* Header - Pass isAuthenticated to navbar if needed */}
+        {/* --- REINTRODUCED: Cursor-following glow element (Z-Index 0) --- */}
+        <Box
+          sx={{
+            position: "fixed", // Use fixed position so it tracks relative to the viewport
+            top: `${glowPosition.y}px`,
+            left: `${glowPosition.x}px`,
+            transform: "translate(-50%, -50%)", // Center the gradient source at the cursor point
+            width: "100vmax",
+            height: "100vmax",
+            // Using low opacity (0.05) for a subtle effect
+            backgroundImage:
+              "radial-gradient(circle, rgba(25, 118, 210, 0.05) 0%, rgba(18, 18, 18, 0) 50%)",
+            zIndex: 0, // Ensure it's behind everything
+            pointerEvents: "none",
+            opacity: 1,
+            transition: "opacity 0.2s",
+          }}
+        />
+        {/* --- END NEW GLOW ELEMENT --- */}
+
+        {/* Header - Content is placed above the glow layer */}
         <HomepageNavbar isAuthenticated={isAuthenticated} userInfo={userInfo} />
 
-        {/* Hero Section */}
-        <Container maxWidth="lg">
-          <HomepageHero />
+        {/* Hero Section and subsequent content */}
+        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
+          <HomepageHero isAuthenticated={isAuthenticated} />
 
           {/* Stats Section */}
-          <HomepageStats />
+          <HomepageStats stats={stats} />
 
           {/* Features Section */}
-          <HomepageFeatures />
+          <HomepageFeatures features={features} />
 
           {/* CTA Section */}
           <HomepageCTA />

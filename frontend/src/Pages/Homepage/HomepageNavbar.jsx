@@ -12,30 +12,30 @@ import { AccountBalance, Menu } from "@mui/icons-material";
 export default function HomepageNavbar({ isAuthenticated, userInfo }) {
   console.log("Navbar - isAuthenticated:", isAuthenticated);
   return (
-    <AppBar position="static" sx={{ bgcolor: "white", boxShadow: 1 }}>
+    <AppBar position="static" sx={{ bgcolor: "#121212", boxShadow: 1 }}>
       <Toolbar>
         <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-          <AccountBalance sx={{ color: "#54B8A9", mr: 1, fontSize: 28 }} />
+          <AccountBalance sx={{ color: "white", mr: 1, fontSize: 28 }} />
           <Typography
             variant="h6"
             component="div"
-            sx={{ color: "#54B8A9", fontWeight: 700 }}
+            sx={{ color: "white", fontWeight: 700 }}
           >
             Moola
           </Typography>
         </Box>
 
         <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
-          <Button color="inherit" sx={{ color: "#64748b" }}>
+          <Button color="inherit" sx={{ color: "white" }}>
             Features
           </Button>
-          <Button color="inherit" sx={{ color: "#64748b" }}>
+          <Button color="inherit" sx={{ color: "white" }}>
             Pricing
           </Button>
-          <Button color="inherit" sx={{ color: "#64748b" }}>
+          <Button color="inherit" sx={{ color: "white" }}>
             About
           </Button>
-          <Button color="inherit" sx={{ color: "#64748b" }}>
+          <Button color="inherit" sx={{ color: "white" }}>
             Contact
           </Button>
         </Box>
