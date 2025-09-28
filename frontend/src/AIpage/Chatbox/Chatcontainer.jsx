@@ -6,7 +6,9 @@ const USER_ID = "user";
 const AI_ID = "ai";
 
 // FIXED: Use your backend URL instead of direct Gemini API
-const BACKEND_URL = "http://localhost:3000/gemini";
+const BACKEND_URL = `${
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"
+}/gemini`;
 
 // Simple ID generator (replaces uuid)
 const generateId = () => Date.now() + Math.random();
