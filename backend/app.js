@@ -43,10 +43,14 @@ app.get("/", (req, res) => {
 import profileRoute from "./routes/profile.js";
 import geminiRoute from "./routes/gemini.js";
 import authRoute from "./routes/auth.js";
+import userRoutes from "./routes/user.js";
+import conversationRoute from "./routes/conversation.js";
 
 app.use("/gemini", geminiRoute);
 app.use("/profile", profileRoute);
 app.use("/auth", authRoute);
+app.use("/api/users", userRoutes);
+app.use("/api/conversation", conversationRoute);
 
 console.log("Routes registered!"); // Debug log
 

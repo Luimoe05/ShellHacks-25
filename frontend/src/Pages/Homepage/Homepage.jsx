@@ -32,17 +32,21 @@ import HomepageHero from "./HomepageHero";
 import HomepageStats from "./HomepageStats";
 import HomepageFeatures from "./HomepageFeatures";
 import HomepageCTA from "./HomepageCTA";
+import { supabase } from "../../DB/supabase";
 
 export default function FinancialAppHomepage() {
-  // Add authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dbConnected, setDbConnected] = useState(false);
 
   // Check authentication status
   useEffect(() => {
     console.log("localStorage auth:", localStorage.getItem("isAuthenticated"));
     console.log("localStorage user:", localStorage.getItem("userInfo"));
+
+    // Test Supabase connection
+    testSupabaseConnection();
 
     fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/status`, {
       credentials: "include",
@@ -58,6 +62,25 @@ export default function FinancialAppHomepage() {
         setLoading(false);
       });
   }, []);
+
+  const testSupabaseConnection = async () => {
+    try {
+      const { data, error } = await supabase.from("UserInfo").select("*"); // Remove limit and get data
+
+      if (error) {
+        console.log("❌ Database NOT Connected:", error.message);
+        setDbConnected(false);
+      } else {
+        console.log("✅ Database Connected Successfully!");
+        console.log("📊 All users in UserInfo table:", data);
+        console.log("👥 Total users:", data.length);
+        setDbConnected(true);
+      }
+    } catch (err) {
+      console.log("❌ Database Connection Failed:", err.message);
+      setDbConnected(false);
+    }
+  };
 
   const features = [
     {
