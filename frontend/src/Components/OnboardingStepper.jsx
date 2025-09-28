@@ -19,8 +19,13 @@ export default function OnboardingStepper() {
     state: "",
     country: "",
     interests: [],
-    goals: "",
     salary: "",
+    goal: "",
+    creditScoreRange: "",
+    timeframe: "",
+    debt: "",
+    housing: "",
+    monthlyIncome: "",
     file: null,
   });
 
