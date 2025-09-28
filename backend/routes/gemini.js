@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
     const userInput = req.query.text;
     const prompt = userInput || "Hello! How can I help you?";
 
-    console.log(`Received GET request with prompt: ${prompt}`);
+    // console.log(`Received GET request with prompt: ${prompt}`);
 
     const explanation = await getAiExplanation(prompt, null);
 
@@ -71,19 +71,19 @@ router.post("/", upload.single("file"), async (req, res) => {
   let filePath = null;
 
   try {
-    console.log("=== GEMINI POST REQUEST DEBUG ===");
-    console.log("Body:", req.body);
-    console.log("File:", req.file ? "File present" : "No file");
-    console.log("================================");
+    // console.log("=== GEMINI POST REQUEST DEBUG ===");
+    // console.log("Body:", req.body);
+    // console.log("File:", req.file ? "File present" : "No file");
+    // console.log("================================");
 
     // CHAT MODE: Detect chat request (has user_id and current_message)
     if (req.body.user_id && req.body.current_message) {
       const { user_id, current_message, conversation_history } = req.body;
 
-      console.log(`Chat Mode - User ${user_id} sent: ${current_message}`);
-      console.log(
-        `Conversation history length: ${conversation_history?.length || 0}`
-      );
+      // console.log(`Chat Mode - User ${user_id} sent: ${current_message}`);
+      // console.log(
+      //   `Conversation history length: ${conversation_history?.length || 0}`
+      // );
 
       // Build context-aware prompt
       let contextPrompt = current_message;
@@ -98,9 +98,9 @@ router.post("/", upload.single("file"), async (req, res) => {
         contextPrompt = `Previous conversation context:\n${context}\n\nCurrent user message: ${current_message}\n\nPlease respond naturally, considering the conversation context.`;
       }
 
-      console.log("Sending to Gemini with context...");
+      // console.log("Sending to Gemini with context...");
       const explanation = await getAiExplanation(contextPrompt);
-      console.log("Received response from Gemini");
+      // console.log("Received response from Gemini");
 
       res.json({
         success: true,
@@ -113,11 +113,11 @@ router.post("/", upload.single("file"), async (req, res) => {
       const userInput = req.body.text;
       const prompt = userInput || "Analyze the provided document.";
 
-      console.log(`File Mode - Received POST request with prompt: ${prompt}`);
+      // console.log(`File Mode - Received POST request with prompt: ${prompt}`);
 
       if (req.file) {
         filePath = req.file.path;
-        console.log(`Received file at temporary path: ${filePath}`);
+        // console.log(`Received file at temporary path: ${filePath}`);
       }
 
       const explanation = await getAiExplanation(prompt, filePath);
@@ -154,7 +154,7 @@ router.post("/", upload.single("file"), async (req, res) => {
 // Save entire conversation to database
 router.post("/save-conversation", async (req, res) => {
   try {
-    console.log("Save conversation request body:", req.body);
+    // console.log("Save conversation request body:", req.body);
 
     const { user_id, conversation } = req.body;
 
@@ -174,9 +174,9 @@ router.post("/save-conversation", async (req, res) => {
       });
     }
 
-    console.log(
-      `Saving conversation for user ${user_id} with ${conversation.length} messages`
-    );
+    // console.log(
+    //   `Saving conversation for user ${user_id} with ${conversation.length} messages`
+    // );
 
     // Create a conversation summary for the title
     const firstUserMessage =
@@ -208,7 +208,7 @@ router.post("/save-conversation", async (req, res) => {
 
     if (error) throw error;
 
-    console.log("Conversation saved successfully:", data[0].id);
+    // console.log("Conversation saved successfully:", data[0].id);
 
     res.json({
       success: true,

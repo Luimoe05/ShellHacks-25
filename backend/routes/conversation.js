@@ -7,7 +7,7 @@ router.post("/", async (req, res) => {
   try {
     const { user_id, content } = req.body;
 
-    console.log("Creating new conversation:", { user_id, content });
+    // console.log("Creating new conversation:", { user_id, content });
 
     const { data, error } = await supabase
       .from("conversations_and_messages")
@@ -19,10 +19,10 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: error.message });
     }
 
-    console.log("Conversation created successfully:", data[0]);
+    // console.log("Conversation created successfully:", data[0]);
     res.json(data[0]);
   } catch (err) {
-    console.error("Unexpected error:", err);
+    // console.error("Unexpected error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -32,7 +32,7 @@ router.get("/user/:user_id", async (req, res) => {
   try {
     const { user_id } = req.params;
 
-    console.log("Fetching conversations for user:", user_id);
+    // console.log("Fetching conversations for user:", user_id);
 
     const { data, error } = await supabase
       .from("conversations_and_messages")
@@ -46,7 +46,7 @@ router.get("/user/:user_id", async (req, res) => {
       return res.status(400).json({ error: error.message });
     }
 
-    console.log(`Found ${data.length} conversations for user ${user_id}`);
+    // console.log(`Found ${data.length} conversations for user ${user_id}`);
     res.json(data);
   } catch (err) {
     console.error("Unexpected error:", err);
@@ -60,12 +60,12 @@ router.post("/:conversation_id/messages", async (req, res) => {
     const { user_id, role, content } = req.body;
     const { conversation_id } = req.params;
 
-    console.log("Adding message to conversation:", {
-      conversation_id,
-      user_id,
-      role,
-      content: content.substring(0, 50) + "...",
-    });
+    // console.log("Adding message to conversation:", {
+    //   conversation_id,
+    //   user_id,
+    //   role,
+    //   content: content.substring(0, 50) + "...",
+    // });
 
     const { data, error } = await supabase
       .from("conversations_and_messages")
@@ -77,7 +77,7 @@ router.post("/:conversation_id/messages", async (req, res) => {
       return res.status(400).json({ error: error.message });
     }
 
-    console.log("Message added successfully:", data[0].id);
+    // console.log("Message added successfully:", data[0].id);
     res.json(data[0]);
   } catch (err) {
     console.error("Unexpected error:", err);
@@ -136,7 +136,7 @@ router.get("/:conversation_id", async (req, res) => {
   try {
     const { conversation_id } = req.params;
 
-    console.log("Fetching messages for conversation:", conversation_id);
+    // console.log("Fetching messages for conversation:", conversation_id);
 
     const { data, error } = await supabase
       .from("conversations_and_messages")
@@ -149,9 +149,9 @@ router.get("/:conversation_id", async (req, res) => {
       return res.status(400).json({ error: error.message });
     }
 
-    console.log(
-      `Found ${data.length} messages in conversation ${conversation_id}`
-    );
+    // console.log(
+    //   `Found ${data.length} messages in conversation ${conversation_id}`
+    // );
     res.json(data);
   } catch (err) {
     console.error("Unexpected error:", err);

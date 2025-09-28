@@ -73,7 +73,7 @@ router.post("/complete", async (req, res) => {
       return res.status(400).json({ error: error.message });
     }
 
-    console.log("User onboarding completed:", data[0]);
+    // console.log("User onboarding completed:", data[0]);
     res.json({
       success: true,
       message: "Onboarding completed successfully",
