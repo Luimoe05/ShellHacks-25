@@ -6,6 +6,8 @@ import supabase from "./DB/supabase.js"; // Add this import
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 // CORS + JSON
 app.use(
   cors({
@@ -101,3 +103,5 @@ const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+export default app;
