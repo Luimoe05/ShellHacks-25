@@ -172,7 +172,7 @@ export default function FinancialAppHomepage() {
           <HomepageCTA />
 
           {/* Footer */}
-          <Footer />
+          {/* <Footer /> */}
         </Container>
       </Box>
     </>

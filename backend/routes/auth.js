@@ -40,4 +40,25 @@ router.get("/status", (req, res) => {
   }
 });
 
+// In routes/auth.js, add this endpoint:
+router.get("/current-user", (req, res) => {
+  try {
+    if (req.oidc && req.oidc.isAuthenticated()) {
+      res.json({
+        success: true,
+        user: {
+          name: req.oidc.user.name,
+          email: req.oidc.user.email,
+          picture: req.oidc.user.picture,
+          sub: req.oidc.user.sub,
+        },
+      });
+    } else {
+      res.status(401).json({ success: false, error: "Not authenticated" });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+});
+
 export default router;
