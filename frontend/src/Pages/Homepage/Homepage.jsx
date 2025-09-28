@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; // Add useState and useEffect
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -32,19 +32,15 @@ import HomepageHero from "./HomepageHero";
 import HomepageStats from "./HomepageStats";
 import HomepageFeatures from "./HomepageFeatures";
 import HomepageCTA from "./HomepageCTA";
+import { supabase } from "../../DB/supabase";
 
-export default function FinancialAppHomepage() {
-  // Add authentication state
+export default function Homepage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // --- NEW: State to track cursor position for the background glow (REINTRODUCED) ---
-  const [glowPosition, setGlowPosition] = useState({ x: 0, y: 0 });
-
   // Check authentication status
   useEffect(() => {
-    // Authentication logic remains the same
     console.log("localStorage auth:", localStorage.getItem("isAuthenticated"));
     console.log("localStorage user:", localStorage.getItem("userInfo"));
 
@@ -63,20 +59,22 @@ export default function FinancialAppHomepage() {
       });
   }, []);
 
-  // --- NEW: Effect to listen for cursor movement (REINTRODUCED) ---
+  // PURE CSS APPROACH: No React state or re-renders
   useEffect(() => {
-    const handleMouseMove = (event) => {
-      // Update state with current cursor position (clientX and clientY)
-      setGlowPosition({ x: event.clientX, y: event.clientY });
+    const handleMouseMove = (e) => {
+      // Directly update CSS custom properties on the document
+      document.documentElement.style.setProperty("--mouse-x", e.clientX + "px");
+      document.documentElement.style.setProperty("--mouse-y", e.clientY + "px");
     };
 
-    // Attach listener to window
-    window.addEventListener("mousemove", handleMouseMove);
+    // Add event listener
+    document.addEventListener("mousemove", handleMouseMove);
+
+    // Cleanup
     return () => {
-      // Cleanup listener on unmount
-      window.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mousemove", handleMouseMove);
     };
-  }, []); // Empty dependency array ensures setup runs once on mount
+  }, []);
 
   const features = [
     {
@@ -112,7 +110,6 @@ export default function FinancialAppHomepage() {
     { label: "Uptime", value: "99.9%" },
   ];
 
-  // Show loading while checking auth
   if (loading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
@@ -123,9 +120,13 @@ export default function FinancialAppHomepage() {
 
   return (
     <>
-      {/* GLOBAL CSS RESET */}
       <GlobalStyles
         styles={{
+          // CSS Variables for mouse position
+          ":root": {
+            "--mouse-x": "0px",
+            "--mouse-y": "0px",
+          },
           body: {
             margin: 0,
             padding: 0,
@@ -135,51 +136,43 @@ export default function FinancialAppHomepage() {
           html: {
             height: "100%",
           },
+          // CSS-only glow effect
+          ".mouse-glow::before": {
+            content: '""',
+            position: "fixed",
+            top: "var(--mouse-y)",
+            left: "var(--mouse-x)",
+            width: "100vmax",
+            height: "100vmax",
+            background:
+              "radial-gradient(circle, rgba(25, 118, 210, 0.15) 0%, rgba(18, 18, 18, 0) 50%)",
+            transform: "translate(-50%, -50%)",
+            pointerEvents: "none",
+            zIndex: 0,
+            transition: "opacity 0.2s ease",
+          },
         }}
       />
 
       <Box
+        className="mouse-glow" // Apply the CSS class for the glow effect
         sx={{
           flexGrow: 1,
           bgcolor: "#121212",
           minHeight: "100vh",
           width: "100vw",
-          position: "relative", // Required for positioning the animation layer
-          overflow: "hidden", // Ensures the large glow doesn't create scrollbars
-          zIndex: 1, // Ensure all content is above the glow layer (which will be zIndex: 0)
+          position: "relative",
+          overflow: "hidden",
+          zIndex: 1,
         }}
       >
-        {/* --- REINTRODUCED: Cursor-following glow element (Z-Index 0) --- */}
-        <Box
-          sx={{
-            position: "fixed", // Use fixed position so it tracks relative to the viewport
-            top: `${glowPosition.y}px`,
-            left: `${glowPosition.x}px`,
-            transform: "translate(-50%, -50%)", // Center the gradient source at the cursor point
-            width: "100vmax",
-            height: "100vmax",
-            // Using low opacity (0.05) for a subtle effect
-            backgroundImage:
-              "radial-gradient(circle, rgba(25, 118, 210, 0.05) 0%, rgba(18, 18, 18, 0) 50%)",
-            zIndex: 0, // Ensure it's behind everything
-            pointerEvents: "none",
-            opacity: 1,
-            transition: "opacity 0.2s",
-          }}
-        />
-        {/* --- END NEW GLOW ELEMENT --- */}
+        {/* No React-based glow element needed - it's pure CSS now */}
 
-        {/* Header - Content is placed above the glow layer */}
         <HomepageNavbar isAuthenticated={isAuthenticated} userInfo={userInfo} />
 
-        {/* Hero Section and subsequent content */}
         <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
           <HomepageHero isAuthenticated={isAuthenticated} />
-
-          {/* Stats Section */}
           <HomepageStats stats={stats} />
-
-          {/* Features Section */}
           <HomepageFeatures features={features} />
 
           {/* CTA Section */}

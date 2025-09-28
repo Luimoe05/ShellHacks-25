@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Typography,
@@ -9,6 +9,13 @@ import {
 } from "@mui/material";
 
 export default function InterestsSlide({ data, setData }) {
+  // Initialize default value when component mounts
+  useEffect(() => {
+    if (!data.interestCategory) {
+      setData((prev) => ({ ...prev, interestCategory: "budgeting" }));
+    }
+  }, [data.interestCategory, setData]);
+
   const roundedInputStyle = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "15px",
@@ -24,20 +31,41 @@ export default function InterestsSlide({ data, setData }) {
   const set = (k) => (e) => setData({ ...data, [k]: e.target.value });
 
   const options = [
-    { value: "investing",  label: "Investing & markets",
-      hint: "Stocks, ETFs, crypto, or getting started with simple portfolios." },
-    { value: "budgeting",  label: "Budgeting & saving",
-      hint: "Track spending, build an emergency fund, and save consistently." },
-    { value: "credit",     label: "Build credit",
-      hint: "Improve score, lower utilization, and pick the right cards." },
-    { value: "debt",       label: "Pay off debt",
-      hint: "Student loans, credit cards, snowball/avalanche strategies." },
-    { value: "retirement", label: "Retirement & long-term",
-      hint: "Roth/Traditional IRA, 401(k), long-term planning." },
-    { value: "smallbiz",   label: "Small business finances",
-      hint: "Track expenses, taxes, and cash flow for a business." },
-    { value: "other",      label: "Other",
-      hint: "Tell us what you’re aiming for—Moola will adapt." },
+    {
+      value: "investing",
+      label: "Investing & markets",
+      hint: "Stocks, ETFs, crypto, or getting started with simple portfolios.",
+    },
+    {
+      value: "budgeting",
+      label: "Budgeting & saving",
+      hint: "Track spending, build an emergency fund, and save consistently.",
+    },
+    {
+      value: "credit",
+      label: "Build credit",
+      hint: "Improve score, lower utilization, and pick the right cards.",
+    },
+    {
+      value: "debt",
+      label: "Pay off debt",
+      hint: "Student loans, credit cards, snowball/avalanche strategies.",
+    },
+    {
+      value: "retirement",
+      label: "Retirement & long-term",
+      hint: "Roth/Traditional IRA, 401(k), long-term planning.",
+    },
+    {
+      value: "smallbiz",
+      label: "Small business finances",
+      hint: "Track expenses, taxes, and cash flow for a business.",
+    },
+    {
+      value: "other",
+      label: "Other",
+      hint: "Tell us what you're aiming for—Moola will adapt.",
+    },
   ];
 
   const isOther = (data.interestCategory || "") === "other";

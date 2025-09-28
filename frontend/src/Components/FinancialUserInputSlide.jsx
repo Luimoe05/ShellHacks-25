@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -12,6 +12,29 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 export default function FinancialUserInputSlide({ data, setData }) {
   const fileInputRef = useRef(null);
+
+  // Initialize default values when component mounts
+  useEffect(() => {
+    const defaults = {
+      creditScoreRange: "650-699",
+      goal: "Build emergency fund",
+      timeframe: "12 months",
+    };
+
+    let hasUpdates = false;
+    const updates = {};
+
+    Object.keys(defaults).forEach((key) => {
+      if (!data[key]) {
+        updates[key] = defaults[key];
+        hasUpdates = true;
+      }
+    });
+
+    if (hasUpdates) {
+      setData((prev) => ({ ...prev, ...updates }));
+    }
+  }, [data.creditScoreRange, data.goal, data.timeframe, setData]);
 
   const roundedInputStyle = {
     "& .MuiOutlinedInput-root": {
