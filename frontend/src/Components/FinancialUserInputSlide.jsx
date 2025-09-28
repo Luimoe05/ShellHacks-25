@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -12,6 +12,29 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 export default function FinancialUserInputSlide({ data, setData }) {
   const fileInputRef = useRef(null);
+
+  // Initialize default values when component mounts
+  useEffect(() => {
+    const defaults = {
+      creditScoreRange: "650-699",
+      goal: "Build emergency fund",
+      timeframe: "12 months",
+    };
+
+    let hasUpdates = false;
+    const updates = {};
+
+    Object.keys(defaults).forEach((key) => {
+      if (!data[key]) {
+        updates[key] = defaults[key];
+        hasUpdates = true;
+      }
+    });
+
+    if (hasUpdates) {
+      setData((prev) => ({ ...prev, ...updates }));
+    }
+  }, [data.creditScoreRange, data.goal, data.timeframe, setData]);
 
   const roundedInputStyle = {
     "& .MuiOutlinedInput-root": {
@@ -80,7 +103,7 @@ export default function FinancialUserInputSlide({ data, setData }) {
           mb: -1,
         }}
       >
-        We’ll personalize Moola’s recommendations based on your numbers.
+        We'll personalize Moola's recommendations based on your numbers.
       </Typography>
 
       <Box sx={{ width: "45%" }}>
@@ -89,7 +112,12 @@ export default function FinancialUserInputSlide({ data, setData }) {
           <Box sx={{ flex: 1 }}>
             <Typography
               variant="subtitle1"
-              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+              sx={{
+                fontWeight: "bold",
+                mb: 0.5,
+                textAlign: "left",
+                color: "white",
+              }}
             >
               Monthly income <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
@@ -105,7 +133,9 @@ export default function FinancialUserInputSlide({ data, setData }) {
                 if (bad.includes(e.key)) e.preventDefault();
               }}
               onPaste={(e) => {
-                const t = (e.clipboardData || window.clipboardData).getData("text");
+                const t = (e.clipboardData || window.clipboardData).getData(
+                  "text"
+                );
                 if (/[^\d]/.test(t)) {
                   e.preventDefault();
                   setData({
@@ -123,7 +153,12 @@ export default function FinancialUserInputSlide({ data, setData }) {
           <Box sx={{ flex: 1 }}>
             <Typography
               variant="subtitle1"
-              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+              sx={{
+                fontWeight: "bold",
+                mb: 0.5,
+                textAlign: "left",
+                color: "white",
+              }}
             >
               Credit score <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
@@ -134,11 +169,13 @@ export default function FinancialUserInputSlide({ data, setData }) {
                 displayEmpty
                 sx={roundedInputStyle}
               >
-                {["600-649", "650-699", "700-749", "750-799", "800+"].map((r) => (
-                  <MenuItem key={r} value={r} sx={{ color: "black" }}>
-                    {r}
-                  </MenuItem>
-                ))}
+                {["600-649", "650-699", "700-749", "750-799", "800+"].map(
+                  (r) => (
+                    <MenuItem key={r} value={r} sx={{ color: "black" }}>
+                      {r}
+                    </MenuItem>
+                  )
+                )}
               </Select>
             </FormControl>
           </Box>
@@ -149,7 +186,12 @@ export default function FinancialUserInputSlide({ data, setData }) {
           <Box sx={{ flex: 1 }}>
             <Typography
               variant="subtitle1"
-              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+              sx={{
+                fontWeight: "bold",
+                mb: 0.5,
+                textAlign: "left",
+                color: "white",
+              }}
             >
               Housing (per month) <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
@@ -165,7 +207,9 @@ export default function FinancialUserInputSlide({ data, setData }) {
                 if (bad.includes(e.key)) e.preventDefault();
               }}
               onPaste={(e) => {
-                const t = (e.clipboardData || window.clipboardData).getData("text");
+                const t = (e.clipboardData || window.clipboardData).getData(
+                  "text"
+                );
                 if (/[^\d]/.test(t)) {
                   e.preventDefault();
                   setData({
@@ -183,9 +227,15 @@ export default function FinancialUserInputSlide({ data, setData }) {
           <Box sx={{ flex: 1 }}>
             <Typography
               variant="subtitle1"
-              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+              sx={{
+                fontWeight: "bold",
+                mb: 0.5,
+                textAlign: "left",
+                color: "white",
+              }}
             >
-              Debt payments (per month) <span style={{ color: "white" }}>ⓘ</span>
+              Debt payments (per month){" "}
+              <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
             <TextField
               fullWidth
@@ -199,7 +249,9 @@ export default function FinancialUserInputSlide({ data, setData }) {
                 if (bad.includes(e.key)) e.preventDefault();
               }}
               onPaste={(e) => {
-                const t = (e.clipboardData || window.clipboardData).getData("text");
+                const t = (e.clipboardData || window.clipboardData).getData(
+                  "text"
+                );
                 if (/[^\d]/.test(t)) {
                   e.preventDefault();
                   setData({
@@ -220,7 +272,12 @@ export default function FinancialUserInputSlide({ data, setData }) {
           <Box sx={{ flex: 1 }}>
             <Typography
               variant="subtitle1"
-              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+              sx={{
+                fontWeight: "bold",
+                mb: 0.5,
+                textAlign: "left",
+                color: "white",
+              }}
             >
               Goal <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
@@ -256,7 +313,12 @@ export default function FinancialUserInputSlide({ data, setData }) {
           <Box sx={{ flex: 1 }}>
             <Typography
               variant="subtitle1"
-              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+              sx={{
+                fontWeight: "bold",
+                mb: 0.5,
+                textAlign: "left",
+                color: "white",
+              }}
             >
               Timeframe <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
@@ -291,7 +353,9 @@ export default function FinancialUserInputSlide({ data, setData }) {
         </Box>
 
         {/* 5) Upload */}
-        <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2, ml: 11 }}>
+        <Box
+          sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2, ml: 11 }}
+        >
           <Button
             variant="outlined"
             startIcon={<CloudUploadIcon />}
@@ -301,7 +365,10 @@ export default function FinancialUserInputSlide({ data, setData }) {
               textTransform: "none",
               borderColor: "white",
               color: "white",
-              "&:hover": { borderColor: "white", backgroundColor: "rgba(255,255,255,0.1)" },
+              "&:hover": {
+                borderColor: "white",
+                backgroundColor: "rgba(255,255,255,0.1)",
+              },
             }}
           >
             Upload statement/PDF
@@ -313,8 +380,13 @@ export default function FinancialUserInputSlide({ data, setData }) {
             accept=".pdf"
             onChange={onFile}
           />
-          <Typography variant="body2" sx={{ color: data.file ? "white" : "red" }}>
-            {data.file ? data.file.name : "*Required for more personalized results"}
+          <Typography
+            variant="body2"
+            sx={{ color: data.file ? "white" : "red" }}
+          >
+            {data.file
+              ? data.file.name
+              : "*Required for more personalized results"}
           </Typography>
         </Box>
       </Box>

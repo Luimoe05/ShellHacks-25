@@ -3,21 +3,23 @@ import ProfileNavbar from "./ProfileNavbar";
 
 function Profile() {
   const [userData, setUserData] = useState({
-    name: "Alex Johnson",
-    age: 28,
-    location: "San Francisco, CA",
-    memberSince: "January 2024",
-    primaryGoal: "Build emergency fund",
-    interestCategory: "investing",
-    monthlyIncome: 4500,
-    creditScore: "750-799",
-    totalSavings: 12500,
-    monthsActive: 8,
-    timeframe: "12 months",
+    name: "",
+
+    location: "",
+    memberSince: "",
+    primaryGoal: "",
+    interestCategory: "",
+    monthlyIncome: 0,
+    creditScore: "",
+    totalSavings: 0,
+    monthsActive: 0,
+    timeframe: "",
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Options from your onboarding components
   const goalOptions = [
@@ -56,9 +58,68 @@ function Profile() {
     "24 months",
   ];
 
+  // Fetch user profile data
+  const fetchUserProfile = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${import.meta.env?.VITE_BACKEND_URL}/profile`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setUserData(data);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+      setError("Failed to load profile data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Save profile updates
+  const saveUserProfile = async (updatedData) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env?.VITE_BACKEND_URL}/profile`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setUserData(data);
+      setError(null);
+      return true;
+    } catch (err) {
+      console.error("Error saving profile:", err);
+      setError("Failed to save profile. Please try again.");
+      return false;
+    }
+  };
+
   useEffect(() => {
-    // Fetch user data from your backend
-    // fetchUserProfile();
+    fetchUserProfile();
   }, []);
 
   const handleEdit = () => {
@@ -66,16 +127,18 @@ function Profile() {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
-    setUserData(editData);
-    setIsEditing(false);
-    // Save to backend
-    // saveUserProfile(editData);
+  const handleSave = async () => {
+    const success = await saveUserProfile(editData);
+    if (success) {
+      setIsEditing(false);
+      setEditData({});
+    }
   };
 
   const handleCancel = () => {
     setEditData({});
     setIsEditing(false);
+    setError(null);
   };
 
   const handleInputChange = (field, value) => {
@@ -286,9 +349,25 @@ function Profile() {
       color: "#ccc",
       fontSize: "14px",
     },
+    errorMessage: {
+      backgroundColor: "rgba(239, 68, 68, 0.2)",
+      border: "1px solid rgba(239, 68, 68, 0.5)",
+      borderRadius: "8px",
+      padding: "16px",
+      color: "#EF4444",
+      marginBottom: "24px",
+    },
+    loadingContainer: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "50vh",
+      fontSize: "18px",
+    },
   };
 
   const getInitials = (name) => {
+    if (!name) return "?";
     return name
       .split(" ")
       .map((n) => n[0])
@@ -300,23 +379,53 @@ function Profile() {
     return interest ? interest.label : value;
   };
 
+  if (loading) {
+    return (
+      <>
+        <ProfileNavbar />
+        <div style={styles.container}>
+          <div style={styles.loadingContainer}>Loading your profile...</div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <ProfileNavbar />
       <div style={styles.container}>
+        {error && (
+          <div style={styles.errorMessage}>
+            {error}
+            <button
+              onClick={fetchUserProfile}
+              style={{
+                marginLeft: "16px",
+                padding: "8px 16px",
+                backgroundColor: "#EF4444",
+                border: "none",
+                borderRadius: "4px",
+                color: "white",
+                cursor: "pointer",
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         {/* Header Section */}
         <div style={styles.headerCard}>
           <div style={styles.profileHeader}>
             <div style={styles.avatar}>{getInitials(userData.name)}</div>
 
             <div style={styles.profileInfo}>
-              <h1 style={styles.profileName}>{userData.name}</h1>
+              <h1 style={styles.profileName}>
+                {userData.name || "Anonymous User"}
+              </h1>
               <div style={styles.location}>
                 <span>📍</span>
-                <span>{userData.location}</span>
-              </div>
-              <div style={styles.memberSince}>
-                Member since {userData.memberSince} • Age {userData.age}
+                <span>{userData.location || "Location not set"}</span>
               </div>
             </div>
 
@@ -342,7 +451,7 @@ function Profile() {
           <div style={styles.statCard}>
             <div style={{ ...styles.statIcon, color: "#3BB273" }}>🏦</div>
             <div style={{ ...styles.statValue, color: "#3BB273" }}>
-              ${userData.totalSavings.toLocaleString()}
+              ${(userData.totalSavings || 0).toLocaleString()}
             </div>
             <div style={styles.statLabel}>Total Savings</div>
           </div>
@@ -369,7 +478,7 @@ function Profile() {
               />
             ) : (
               <div style={{ ...styles.statValue, color: "#2E8BC0" }}>
-                ${userData.monthlyIncome.toLocaleString()}
+                ${(userData.monthlyIncome || 0).toLocaleString()}
               </div>
             )}
             <div style={styles.statLabel}>Monthly Income</div>
@@ -402,7 +511,7 @@ function Profile() {
               </select>
             ) : (
               <div style={{ ...styles.statValue, color: "#3BB273" }}>
-                {userData.creditScore}
+                {userData.creditScore || "Not set"}
               </div>
             )}
             <div style={styles.statLabel}>Credit Score</div>
@@ -411,7 +520,7 @@ function Profile() {
           <div style={styles.statCard}>
             <div style={{ ...styles.statIcon, color: "#2E8BC0" }}>⏱️</div>
             <div style={{ ...styles.statValue, color: "#2E8BC0" }}>
-              {userData.monthsActive}
+              {userData.monthsActive || 0}
             </div>
             <div style={styles.statLabel}>Months Active</div>
           </div>
@@ -443,7 +552,9 @@ function Profile() {
                   ))}
                 </select>
               ) : (
-                <span style={styles.chip}>{userData.primaryGoal}</span>
+                <span style={styles.chip}>
+                  {userData.primaryGoal || "Not set"}
+                </span>
               )}
             </div>
 
@@ -468,7 +579,9 @@ function Profile() {
                   ))}
                 </select>
               ) : (
-                <span style={styles.chipOutlined}>{userData.timeframe}</span>
+                <span style={styles.chipOutlined}>
+                  {userData.timeframe || "Not set"}
+                </span>
               )}
             </div>
 
@@ -492,12 +605,9 @@ function Profile() {
 
             <div style={styles.editableField}>
               <label style={styles.label}>Name (Read Only)</label>
-              <div style={styles.readOnlyField}>{userData.name}</div>
-            </div>
-
-            <div style={styles.editableField}>
-              <label style={styles.label}>Age (Read Only)</label>
-              <div style={styles.readOnlyField}>{userData.age} years old</div>
+              <div style={styles.readOnlyField}>
+                {userData.name || "Not available"}
+              </div>
             </div>
 
             <div style={styles.editableField}>
@@ -505,7 +615,7 @@ function Profile() {
               {isEditing ? (
                 <input
                   type="text"
-                  value={editData.location || userData.location}
+                  value={editData.location || userData.location || ""}
                   onChange={(e) =>
                     handleInputChange("location", e.target.value)
                   }
@@ -513,7 +623,7 @@ function Profile() {
                   placeholder="Enter your location"
                 />
               ) : (
-                <div style={styles.input}>{userData.location}</div>
+                <div style={styles.input}>{userData.location || "Not set"}</div>
               )}
             </div>
 
@@ -539,7 +649,7 @@ function Profile() {
                 </select>
               ) : (
                 <span style={styles.chipOutlined}>
-                  {getInterestLabel(userData.interestCategory)}
+                  {getInterestLabel(userData.interestCategory) || "Not set"}
                 </span>
               )}
             </div>
