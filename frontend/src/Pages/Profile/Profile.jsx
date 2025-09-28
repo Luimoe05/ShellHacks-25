@@ -4,16 +4,17 @@ import ProfileNavbar from "./ProfileNavbar";
 function Profile() {
   const [userData, setUserData] = useState({
     name: "",
-
     location: "",
     memberSince: "",
     primaryGoal: "",
-    interestCategory: "",
     monthlyIncome: 0,
-    creditScore: "",
+    creditScore: 0,
     totalSavings: 0,
     monthsActive: 0,
-    timeframe: "",
+    timeframe: 0,
+    annualSalary: 0,
+    housingPayment: 0,
+    debtPayment: 0,
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -31,32 +32,7 @@ function Profile() {
     "Build credit",
   ];
 
-  const interestOptions = [
-    { value: "investing", label: "Investing & markets" },
-    { value: "budgeting", label: "Budgeting & saving" },
-    { value: "credit", label: "Build credit" },
-    { value: "debt", label: "Pay off debt" },
-    { value: "retirement", label: "Retirement & long-term" },
-    { value: "smallbiz", label: "Small business finances" },
-    { value: "other", label: "Other" },
-  ];
-
-  const creditScoreOptions = [
-    "600-649",
-    "650-699",
-    "700-749",
-    "750-799",
-    "800+",
-  ];
-
-  const timeframeOptions = [
-    "3 months",
-    "6 months",
-    "9 months",
-    "12 months",
-    "18 months",
-    "24 months",
-  ];
+  const timeframeOptions = [3, 6, 9, 12, 18, 24];
 
   // Fetch user profile data
   const fetchUserProfile = async () => {
@@ -78,6 +54,7 @@ function Profile() {
       }
 
       const data = await response.json();
+      console.log("Profile data received:", data); // Debug log
       setUserData(data);
       setError(null);
     } catch (err) {
@@ -91,6 +68,7 @@ function Profile() {
   // Save profile updates
   const saveUserProfile = async (updatedData) => {
     try {
+      console.log("Saving profile data:", updatedData); // Debug log
       const response = await fetch(
         `${import.meta.env?.VITE_BACKEND_URL}/profile`,
         {
@@ -108,6 +86,7 @@ function Profile() {
       }
 
       const data = await response.json();
+      console.log("Profile updated:", data); // Debug log
       setUserData(data);
       setError(null);
       return true;
@@ -210,9 +189,6 @@ function Profile() {
       fontSize: "14px",
       fontWeight: "bold",
       transition: "all 0.2s ease",
-      ":hover": {
-        backgroundColor: "rgba(255,255,255,0.3)",
-      },
     },
     saveButton: {
       background: "linear-gradient(135deg, #3BB273 0%, #2E8BC0 100%)",
@@ -374,11 +350,6 @@ function Profile() {
       .join("");
   };
 
-  const getInterestLabel = (value) => {
-    const interest = interestOptions.find((opt) => opt.value === value);
-    return interest ? interest.label : value;
-  };
-
   if (loading) {
     return (
       <>
@@ -427,6 +398,9 @@ function Profile() {
                 <span>📍</span>
                 <span>{userData.location || "Location not set"}</span>
               </div>
+              <div style={styles.memberSince}>
+                Member since {userData.memberSince || "Unknown"}
+              </div>
             </div>
 
             {!isEditing ? (
@@ -446,16 +420,7 @@ function Profile() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div style={styles.statsGrid}>
-          <div style={styles.statCard}>
-            <div style={{ ...styles.statIcon, color: "#3BB273" }}>🏦</div>
-            <div style={{ ...styles.statValue, color: "#3BB273" }}>
-              ${(userData.totalSavings || 0).toLocaleString()}
-            </div>
-            <div style={styles.statLabel}>Total Savings</div>
-          </div>
-
+      
           <div style={styles.statCard}>
             <div style={{ ...styles.statIcon, color: "#2E8BC0" }}>📈</div>
             {isEditing ? (
@@ -465,7 +430,7 @@ function Profile() {
                 onChange={(e) =>
                   handleInputChange(
                     "monthlyIncome",
-                    parseInt(e.target.value) || 0
+                    parseFloat(e.target.value) || 0
                   )
                 }
                 style={{
@@ -485,48 +450,63 @@ function Profile() {
           </div>
 
           <div style={styles.statCard}>
-            <div style={{ ...styles.statIcon, color: "#3BB273" }}>📊</div>
+            <div style={{ ...styles.statIcon, color: "#E74C3C" }}>🏠</div>
             {isEditing ? (
-              <select
-                value={editData.creditScore || userData.creditScore}
+              <input
+                type="number"
+                value={editData.housingPayment || ""}
                 onChange={(e) =>
-                  handleInputChange("creditScore", e.target.value)
+                  handleInputChange(
+                    "housingPayment",
+                    parseFloat(e.target.value) || 0
+                  )
                 }
                 style={{
-                  ...styles.select,
+                  ...styles.input,
                   textAlign: "center",
-                  fontSize: "20px",
+                  fontSize: "24px",
                   fontWeight: "bold",
                 }}
-              >
-                {creditScoreOptions.map((score) => (
-                  <option
-                    key={score}
-                    value={score}
-                    style={{ backgroundColor: "#333", color: "white" }}
-                  >
-                    {score}
-                  </option>
-                ))}
-              </select>
+                placeholder="Housing Payment"
+              />
             ) : (
-              <div style={{ ...styles.statValue, color: "#3BB273" }}>
-                {userData.creditScore || "Not set"}
+              <div style={{ ...styles.statValue, color: "#E74C3C" }}>
+                ${(userData.housingPayment || 0).toLocaleString()}
               </div>
             )}
-            <div style={styles.statLabel}>Credit Score</div>
+            <div style={styles.statLabel}>Housing Payment</div>
           </div>
 
           <div style={styles.statCard}>
-            <div style={{ ...styles.statIcon, color: "#2E8BC0" }}>⏱️</div>
-            <div style={{ ...styles.statValue, color: "#2E8BC0" }}>
-              {userData.monthsActive || 0}
-            </div>
-            <div style={styles.statLabel}>Months Active</div>
+            <div style={{ ...styles.statIcon, color: "#F39C12" }}>💳</div>
+            {isEditing ? (
+              <input
+                type="number"
+                value={editData.debtPayment || ""}
+                onChange={(e) =>
+                  handleInputChange(
+                    "debtPayment",
+                    parseFloat(e.target.value) || 0
+                  )
+                }
+                style={{
+                  ...styles.input,
+                  textAlign: "center",
+                  fontSize: "24px",
+                  fontWeight: "bold",
+                }}
+                placeholder="Debt Payment"
+              />
+            ) : (
+              <div style={{ ...styles.statValue, color: "#F39C12" }}>
+                ${(userData.debtPayment || 0).toLocaleString()}
+              </div>
+            )}
+            <div style={styles.statLabel}>Debt Payment</div>
           </div>
         </div>
 
-        {/* Financial Goals & Interests */}
+        {/* Financial Goals & Personal Info */}
         <div style={styles.contentGrid}>
           <div style={styles.card}>
             <h2 style={styles.cardTitle}>Financial Goals</h2>
@@ -541,6 +521,12 @@ function Profile() {
                   }
                   style={styles.select}
                 >
+                  <option
+                    value=""
+                    style={{ backgroundColor: "#333", color: "white" }}
+                  >
+                    Select a goal...
+                  </option>
                   {goalOptions.map((goal) => (
                     <option
                       key={goal}
@@ -568,6 +554,12 @@ function Profile() {
                   }
                   style={styles.select}
                 >
+                  <option
+                    value=""
+                    style={{ backgroundColor: "#333", color: "white" }}
+                  >
+                    Select timeframe...
+                  </option>
                   {timeframeOptions.map((time) => (
                     <option
                       key={time}
@@ -593,10 +585,10 @@ function Profile() {
                 fontSize: "16px",
               }}
             >
-              Progress This Month
+              Account Status
             </h3>
             <div style={styles.progressBox}>
-              📈 On track to save $800 this month
+              📅 Active for {userData.monthsActive || 0} months
             </div>
           </div>
 
@@ -620,7 +612,7 @@ function Profile() {
                     handleInputChange("location", e.target.value)
                   }
                   style={styles.input}
-                  placeholder="Enter your location"
+                  placeholder="City, Country"
                 />
               ) : (
                 <div style={styles.input}>{userData.location || "Not set"}</div>
@@ -628,28 +620,34 @@ function Profile() {
             </div>
 
             <div style={styles.editableField}>
-              <label style={styles.label}>Primary Interest</label>
+              <label style={styles.label}>Credit Score</label>
               {isEditing ? (
                 <select
-                  value={editData.interestCategory || userData.interestCategory}
+                  value={editData.creditScore || userData.creditScore}
                   onChange={(e) =>
-                    handleInputChange("interestCategory", e.target.value)
+                    handleInputChange("creditScore", e.target.value)
                   }
                   style={styles.select}
                 >
-                  {interestOptions.map((interest) => (
+                  <option
+                    value=""
+                    style={{ backgroundColor: "#333", color: "white" }}
+                  >
+                    Select credit score range...
+                  </option>
+                  {creditScoreOptions.map((score) => (
                     <option
-                      key={interest.value}
-                      value={interest.value}
+                      key={score}
+                      value={score}
                       style={{ backgroundColor: "#333", color: "white" }}
                     >
-                      {interest.label}
+                      {score}
                     </option>
                   ))}
                 </select>
               ) : (
                 <span style={styles.chipOutlined}>
-                  {getInterestLabel(userData.interestCategory) || "Not set"}
+                  {userData.creditScore || "Not set"}
                 </span>
               )}
             </div>
