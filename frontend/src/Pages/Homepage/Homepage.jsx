@@ -41,9 +41,31 @@ export default function Homepage() {
 
   // Check authentication status
   useEffect(() => {
-    console.log("localStorage auth:", localStorage.getItem("isAuthenticated"));
-    console.log("localStorage user:", localStorage.getItem("userInfo"));
+    // Check URL parameters first
+    const urlParams = new URLSearchParams(window.location.search);
+    const authParam = urlParams.get("auth");
+    const userParam = urlParams.get("user");
 
+    if (authParam === "true" && userParam) {
+      try {
+        const userData = JSON.parse(decodeURIComponent(userParam));
+        setIsAuthenticated(true);
+        setUserInfo(userData);
+        setLoading(false);
+
+        // Clean up URL
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname
+        );
+        return;
+      } catch (error) {
+        console.error("Error parsing user data from URL:", error);
+      }
+    }
+
+    // Fallback to API check
     fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/status`, {
       credentials: "include",
     })
