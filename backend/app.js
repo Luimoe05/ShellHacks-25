@@ -43,16 +43,15 @@ app.get("/", (req, res) => {
   }
 });
 
-// Routes (No change, just ensure geminiRoute points to the updated file)
 import profileRoute from "./routes/profile.js";
-import geminiRoute from "./routes/gemini.js"; // This file is now updated to handle POST
+import geminiRoute from "./routes/gemini.js";
 import authRoute from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
 import conversationRoute from "./routes/conversation.js";
 import onboardingRoutes from "./routes/onboarding.js";
 app.use("/onboarding", onboardingRoutes);
 
-app.use("/gemini", geminiRoute); // This will now handle the POST request
+app.use("/gemini", geminiRoute);
 app.use("/profile", profileRoute);
 app.use("/auth", authRoute);
 app.use("/api/users", userRoutes);

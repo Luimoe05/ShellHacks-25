@@ -29,65 +29,73 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Main chat endpoint - handles individual messages with context (PRIMARY)
-router.post("/", async (req, res) => {
-  try {
-    const { user_id, current_message, conversation_history } = req.body;
-
-    console.log(`User ${user_id} sent: ${current_message}`);
-    console.log(
-      `Conversation history length: ${conversation_history?.length || 0}`
-    );
-
-    // Build context-aware prompt
-    let contextPrompt = current_message;
-
-    if (conversation_history && conversation_history.length > 0) {
-      // Include recent conversation history (last 10 messages to avoid token limits)
-      const recentHistory = conversation_history.slice(-10);
-      const context = recentHistory
-        .map((msg) => `${msg.role}: ${msg.content}`)
-        .join("\n");
-
-      contextPrompt = `Previous conversation context:\n${context}\n\nCurrent user message: ${current_message}\n\nPlease respond naturally, considering the conversation context.`;
-    }
-
-    console.log("Sending to Gemini with context...");
-    const explanation = await getAiExplanation(contextPrompt);
-    console.log("Received response from Gemini");
-
-    res.json({
-      success: true,
-      explanation: explanation,
-      message_count: conversation_history?.length || 0,
-    });
-  } catch (error) {
-    console.error("Error in chat endpoint:", error.message);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
-
-// Handle file uploads
-router.post("/upload", upload.single("file"), async (req, res) => {
+// Handle POST requests - chat with history, file uploads, everything
+router.post("/", upload.single("file"), async (req, res) => {
   let filePath = null;
 
   try {
-    const userInput = req.body.text;
-    const prompt = userInput || "Analyze the provided document.";
+    console.log("=== GEMINI POST REQUEST DEBUG ===");
+    console.log("Body:", req.body);
+    console.log("File:", req.file ? "File present" : "No file");
+    console.log("================================");
 
-    console.log(`Received POST request with prompt: ${prompt}`);
+    // CHAT MODE: Detect chat request (has user_id and current_message)
+    if (req.body.user_id && req.body.current_message) {
+      const { user_id, current_message, conversation_history } = req.body;
 
-    if (req.file) {
-      filePath = req.file.path;
-      console.log(`Received file at temporary path: ${filePath}`);
+      console.log(`Chat Mode - User ${user_id} sent: ${current_message}`);
+      console.log(
+        `Conversation history length: ${conversation_history?.length || 0}`
+      );
+
+      // Build context-aware prompt
+      let contextPrompt = current_message;
+
+      if (conversation_history && conversation_history.length > 0) {
+        // Include recent conversation history (last 10 messages to avoid token limits)
+        const recentHistory = conversation_history.slice(-10);
+        const context = recentHistory
+          .map((msg) => `${msg.role}: ${msg.content}`)
+          .join("\n");
+
+        contextPrompt = `Previous conversation context:\n${context}\n\nCurrent user message: ${current_message}\n\nPlease respond naturally, considering the conversation context.`;
+      }
+
+      console.log("Sending to Gemini with context...");
+      const explanation = await getAiExplanation(contextPrompt);
+      console.log("Received response from Gemini");
+
+      res.json({
+        success: true,
+        explanation: explanation,
+        message_count: conversation_history?.length || 0,
+      });
     }
+    // FILE UPLOAD MODE: Detect file upload request (has text field or file)
+    else if (req.body.text || req.file) {
+      const userInput = req.body.text;
+      const prompt = userInput || "Analyze the provided document.";
 
-    const explanation = await getAiExplanation(prompt, filePath);
+      console.log(`File Mode - Received POST request with prompt: ${prompt}`);
 
-    res.json({ success: true, explanation: explanation });
+      if (req.file) {
+        filePath = req.file.path;
+        console.log(`Received file at temporary path: ${filePath}`);
+      }
+
+      const explanation = await getAiExplanation(prompt, filePath);
+
+      res.json({ success: true, explanation: explanation });
+    }
+    // ERROR: Unknown request format
+    else {
+      console.error("Unknown request format:", req.body);
+      res.status(400).json({
+        success: false,
+        message:
+          "Invalid request format. Expected chat data (user_id, current_message) or file data (text, file).",
+      });
+    }
   } catch (error) {
     console.error("POST Route Error:", error.message);
     res.status(500).json({
@@ -95,7 +103,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
       message: error.message,
     });
   } finally {
-    // Cleanup file
+    // Cleanup file if it exists
     if (filePath) {
       try {
         await fs.promises.unlink(filePath);
