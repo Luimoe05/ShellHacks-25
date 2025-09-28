@@ -24,8 +24,7 @@ export default function FinancialUserInputSlide({ data, setData }) {
     setData({ ...data, file });
   };
 
-  // === shrink everything as a unit ===
-  const SCALE = 0.9; // try 0.85–0.95 to taste
+  const SCALE = 0.9; 
 
   return (
     <Box
@@ -40,7 +39,7 @@ export default function FinancialUserInputSlide({ data, setData }) {
         mt: 2,
         transform: `scale(${SCALE})`,
         transformOrigin: "top left",
-        width: `${100 / SCALE}%`, // compensate shrink so layout doesn’t collapse
+        width: `${100 / SCALE}%`, 
       }}
     >
       {/* Header */}

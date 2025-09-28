@@ -33,7 +33,6 @@ export default function InterestsSlide({ data, setData }) {
 
   const isOther = (data.interestCategory || "") === "other";
 
-  // === shrink everything as a unit ===
   const SCALE = 1; 
 
   return (
@@ -44,13 +43,11 @@ export default function InterestsSlide({ data, setData }) {
         px: 6,
         py: 4,
         boxSizing: "border-box",
-        ml: 57,           // keep your layout push if you want
+        ml: 57,           
         mt: 1,
-        // shrink block while preserving layout width
         transform: `scale(${SCALE})`,
         transformOrigin: "top left",
         width: `${100 / SCALE}%`,
-        // small screens: shrink a bit more automatically
         "@media (max-width:1200px)": {
           transform: "scale(0.82)",
           width: `${100 / 0.82}%`,
@@ -64,7 +61,6 @@ export default function InterestsSlide({ data, setData }) {
           textAlign: "left",
           width: "100%",
           mt: 0,
-          // safer responsive title size
           fontSize: "clamp(24px, 3.2vw, 25px)",
           lineHeight: 1.15,
         }}
@@ -100,7 +96,7 @@ export default function InterestsSlide({ data, setData }) {
             sx={{
                 alignItems: "flex-start",
                 width: "100%",
-                mb: 2, // ⬅️ spacing between options
+                mb: 2, 
                 "& .MuiFormControlLabel-label": { width: "100%" },
             }}
             label={

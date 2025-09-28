@@ -69,19 +69,13 @@ button:focus-visible {
 
 /* index.css */
 
-/* 1. MANDATORY FULL-VIEWPORT RESET */
 html, body, #root {
   margin: 0;
   padding: 0;
   height: 100%;       
   width: 100%;        
-  /* CRITICAL: Disables ALL scrolling on the main page canvas */
-  overflow: hidden; 
-  /* Sets the default background color to prevent the white glare/flicker */
-  background-color: #f5f5f5; 
 }
 
-/* 2. Body Layout Adjustment (Overrides defaults like display: flex) */
 body {
   display: block; 
   min-height: 100vh;

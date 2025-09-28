@@ -37,14 +37,11 @@ export default function OnboardingStepper() {
     if (activeStep > 0) setActiveStep((prev) => prev - 1);
   };
 
-  // 1. Create a single object to hold all props passed down to slides
-  // NOTE: We only need the form data props for the content slides now.
   const formSlideProps = {
     data: formData,
     setData: setFormData,
   };
 
-  // 2. The slides array contains only the content slides.
   const slides = [
     <NameLocationSlide {...formSlideProps} />,
     <InterestsSlide {...formSlideProps} />,
@@ -60,10 +57,9 @@ export default function OnboardingStepper() {
           
           {/* 2. Renders the Stepper (and its buttons) that STAYS */}
           <Box sx={{ 
-              width: '35%', // Keeping a fixed width for alignment if you wish
+              width: '35%', 
               display: 'flex', 
               justifyContent: 'center',
-              // Align the persistent stepper
               ml: 62,
               mt:-5,
           }}>

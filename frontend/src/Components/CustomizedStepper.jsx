@@ -19,7 +19,6 @@ const ACTIVE_GRADIENT = 'linear-gradient(135deg, #2E8BC0 0%, #3BB273 100%)';
 const INACTIVE_COLOR = '#424242'; 
 const LINE_COLOR = '#616161';
 
-// 1. Custom Step Connector (Adapted for Colorlib style)
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
     top: 30,
@@ -44,7 +43,6 @@ const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   },
 }));
 
-// 2. Custom Step Icon Root (The Circle)
 const ColorlibStepIconRoot = styled('div')(({ theme, ownerState }) => ({
   backgroundColor: INACTIVE_COLOR,
   zIndex: 1,
