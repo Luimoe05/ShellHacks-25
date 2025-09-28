@@ -57,18 +57,8 @@ export default function MoolaNavbar() {
         <AccountBalance sx={{ color: "White", mr: 1, fontSize: 28 }} />
         <Typography
           variant="h6"
-          noWrap
-          component="a"
-          href="#" // Placeholder for homepage link
-          sx={{
-            mr: 2,
-            display: { xs: "none", md: "flex" },
-            fontFamily: "monospace",
-            fontWeight: 700,
-            letterSpacing: ".1rem",
-            color: "inherit",
-            textDecoration: "none",
-          }}
+          component="div"
+          sx={{ color: "white", fontWeight: 700, marginRight: 2 }}
         >
           Moola
         </Typography>
@@ -137,13 +127,22 @@ export default function MoolaNavbar() {
           Moola
         </Typography>
 
-        {/* Desktop Navigation Links (Financials, Transactions, Settings) */}
-        <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+        <Box
+          sx={{ flexGrow: 1, display: { xs: "none", md: "flex", gap: "10px" } }}
+        >
           {pages.map((page) => (
             <Button
               key={page}
               onClick={handleCloseNavMenu}
-              sx={{ my: 2, color: "White", display: "block" }} // Changed button color to black to match new AppBar color
+              sx={{
+                my: 2,
+                color: "White",
+                display: "block",
+                transition: "all 0.3s ease-in-out",
+                "&:hover": {
+                  backgroundColor: "#474747",
+                },
+              }} // Changed button color to black to match new AppBar color
             >
               {page}
             </Button>
@@ -191,7 +190,15 @@ export default function MoolaNavbar() {
         <Button
           color="inherit"
           startIcon={<HomeRounded />}
-          sx={{ ml: 2, display: { xs: "none", md: "flex" }, color: "white" }} // Changed button color to black
+          sx={{
+            ml: 2,
+            display: { xs: "none", md: "flex" },
+            color: "white",
+            transition: "all 0.3s ease-in-out",
+            "&:hover": {
+              backgroundColor: "#474747",
+            },
+          }}
           onClick={() => navigate("/")}
         >
           Back to Home
