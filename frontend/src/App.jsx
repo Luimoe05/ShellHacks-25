@@ -1,14 +1,16 @@
-import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import "./App.css";
 import Homepage from "./Pages/Homepage/Homepage.jsx";
-// import Gemini from "./AIpage/Gemini.jsx";
 import AIPage from "./AIpage/AIPage.jsx";
 import OnboardingStepper from "./Components/OnboardingStepper.jsx";
 import Profile from "./Pages/Profile/Profile.jsx";
-import Footer from "./Pages/Footer.jsx";
 import About from "./Pages/About.jsx";
+
 function App() {
   return (
     <Router>
@@ -18,6 +20,7 @@ function App() {
         <Route path="/onboarding" element={<OnboardingStepper />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/about" element={<About />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
