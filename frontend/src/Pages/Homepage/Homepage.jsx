@@ -41,6 +41,11 @@ export default function Homepage() {
 
   // Check authentication status
   useEffect(() => {
+    console.log("localStorage auth:", localStorage.getItem("isAuthenticated"));
+    console.log("localStorage user:", localStorage.getItem("userInfo"));
+    console.log("VITE_BACKEND_URL:", import.meta.env.VITE_BACKEND_URL);
+    console.log("All env vars:", import.meta.env);
+
     // Check URL parameters first
     const urlParams = new URLSearchParams(window.location.search);
     const authParam = urlParams.get("auth");
@@ -65,7 +70,8 @@ export default function Homepage() {
       }
     }
 
-    // Remove the fallback API check that was causing CORS issues
+    // Fallback: just set loading to false without API call to avoid CORS issues
+    setIsAuthenticated(false);
     setLoading(false);
   }, []);
 
