@@ -1,7 +1,7 @@
 import React from "react";
 import { Paper, Typography, Box, Chip, Button } from "@mui/material";
 
-export default function HomepageCTA() {
+export default function HomepageCTA({ isAuthenticated }) {
   return (
     <Paper
       elevation={3}
@@ -9,9 +9,8 @@ export default function HomepageCTA() {
         p: 6,
         textAlign: "center",
         borderRadius: 3,
-        // Gradient matching the Stats Section
         background: [
-          "#2A7B9B", // Solid color fallback
+          "#2A7B9B", 
           "linear-gradient(90deg, rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 78%, rgba(191, 237, 83, 1) 100%)",
         ],
         color: "white",
@@ -22,7 +21,7 @@ export default function HomepageCTA() {
         Ready to Transform Your Finances?
       </Typography>
       <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
-        Join millions of users who trust FinanceFlow with their financial
+        Join millions of users who trust Moola with their financial
         future.
       </Typography>
       <Box
@@ -50,7 +49,7 @@ export default function HomepageCTA() {
         />
       </Box>
       <Box sx={{ mt: 4 }}>
-        <Button
+       { !isAuthenticated && <Button
           size="large"
           variant="outlined"
           sx={{
@@ -67,7 +66,7 @@ export default function HomepageCTA() {
           }}
         >
           Create Your Account
-        </Button>
+        </Button>}
       </Box>
     </Paper>
   );

@@ -183,7 +183,7 @@ export default function FinancialAppHomepage() {
           <HomepageFeatures features={features} />
 
           {/* CTA Section */}
-          <HomepageCTA />
+          <HomepageCTA isAuthenticated={isAuthenticated}/>
 
           {/* Footer */}
           <Footer />

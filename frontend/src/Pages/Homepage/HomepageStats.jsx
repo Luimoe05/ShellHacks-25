@@ -3,9 +3,9 @@ import { Paper, Grid, Box, Typography } from "@mui/material";
 
 // Mock data (This should ideally be passed as a prop from the parent component)
 const stats = [
-  { label: "Active Users", value: "2M+" },
-  { label: "Total Transactions", value: "$50B+" },
-  { label: "Countries Served", value: "25+" },
+  { label: "Average Monthly Savings ", value: "20%+" },
+  { label: "Hours Saved", value: "1000+" },
+  { label: "Active Users", value: "500+" },
   { label: "Uptime", value: "99.9%" },
 ];
 
