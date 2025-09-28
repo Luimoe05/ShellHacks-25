@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   TextField,
@@ -8,19 +8,26 @@ import {
   FormControl,
 } from "@mui/material";
 
-export default function NameLocationSlide({ data, setData }) { 
+export default function NameLocationSlide({ data, setData }) {
+  // Initialize default values when component mounts
+  useEffect(() => {
+    if (!data.country) {
+      setData((prev) => ({ ...prev, country: "United States" }));
+    }
+  }, [data.country, setData]);
+
   const roundedInputStyle = {
     "& .MuiOutlinedInput-root": {
-    borderRadius: "15px",
-    color: "white",               
-    backgroundColor: "rgba(255,255,255,0.15)",
-    "& fieldset": { borderColor: "white" },
-    "&:hover fieldset": { borderColor: "white" },
-    "&.Mui-focused fieldset": { borderColor: "white" },
-  },
-  "& .MuiInputLabel-root": { color: "white" },
-  "& .MuiInputBase-input": { color: "white" }, 
-  "& .MuiSvgIcon-root": { color: "white" },
+      borderRadius: "15px",
+      color: "white",
+      backgroundColor: "rgba(255,255,255,0.15)",
+      "& fieldset": { borderColor: "white" },
+      "&:hover fieldset": { borderColor: "white" },
+      "&.Mui-focused fieldset": { borderColor: "white" },
+    },
+    "& .MuiInputLabel-root": { color: "white" },
+    "& .MuiInputBase-input": { color: "white" },
+    "& .MuiSvgIcon-root": { color: "white" },
   };
 
   return (
@@ -67,7 +74,12 @@ export default function NameLocationSlide({ data, setData }) {
         {/* 1. Your Name Field */}
         <Typography
           variant="subtitle1"
-          sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+          sx={{
+            fontWeight: "bold",
+            mb: 0.5,
+            textAlign: "left",
+            color: "white",
+          }}
         >
           Your Name <span style={{ color: "white" }}>ⓘ</span>
         </Typography>
@@ -85,7 +97,12 @@ export default function NameLocationSlide({ data, setData }) {
           <Box sx={{ flex: 1 }}>
             <Typography
               variant="subtitle1"
-              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+              sx={{
+                fontWeight: "bold",
+                mb: 0.5,
+                textAlign: "left",
+                color: "white",
+              }}
             >
               City <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
@@ -101,7 +118,12 @@ export default function NameLocationSlide({ data, setData }) {
           <Box sx={{ flex: 1 }}>
             <Typography
               variant="subtitle1"
-              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+              sx={{
+                fontWeight: "bold",
+                mb: 0.5,
+                textAlign: "left",
+                color: "white",
+              }}
             >
               Country / region <span style={{ color: "white" }}>ⓘ</span>
             </Typography>

@@ -7,7 +7,7 @@ router.post("/", async (req, res) => {
   const { auth0_id, email, name, picture } = req.body;
 
   const { data, error } = await supabase
-    .from("users")
+    .from("UserInfo")
     .insert([{ auth0_id, email, name, picture }])
     .select();
 
@@ -18,9 +18,9 @@ router.post("/", async (req, res) => {
 // READ user by ID
 router.get("/:id", async (req, res) => {
   const { data, error } = await supabase
-    .from("users")
+    .from("UserInfo")
     .select("*")
-    .eq("id", req.params.id)
+    .eq("Id", req.params.id)
     .single();
 
   if (error) return res.status(404).json({ error: error.message });
@@ -30,9 +30,9 @@ router.get("/:id", async (req, res) => {
 // UPDATE user by ID
 router.put("/:id", async (req, res) => {
   const { data, error } = await supabase
-    .from("users")
+    .from("UserInfo")
     .update(req.body)
-    .eq("id", req.params.id)
+    .eq("Id", req.params.id)
     .select();
 
   if (error) return res.status(400).json({ error: error.message });
@@ -42,9 +42,9 @@ router.put("/:id", async (req, res) => {
 // DELETE user by ID
 router.delete("/:id", async (req, res) => {
   const { error } = await supabase
-    .from("users")
+    .from("UserInfo")
     .delete()
-    .eq("id", req.params.id);
+    .eq("Id", req.params.id);
 
   if (error) return res.status(400).json({ error: error.message });
   res.json({ success: true });
