@@ -39,6 +39,20 @@ router.put("/:id", async (req, res) => {
   res.json(data[0]);
 });
 
+// In your routes/user.js, update the route:
+router.get("/by-auth0/:auth0_id", async (req, res) => {
+  // Decode the auth0_id parameter
+  const auth0_id = decodeURIComponent(req.params.auth0_id);
+
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("auth0_id", auth0_id)
+    .single();
+
+  if (error) return res.status(404).json({ error: error.message });
+  res.json(data);
+});
 // DELETE user by ID
 router.delete("/:id", async (req, res) => {
   const { error } = await supabase
