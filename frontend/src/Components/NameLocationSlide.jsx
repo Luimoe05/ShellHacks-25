@@ -12,14 +12,14 @@ export default function NameLocationSlide({ data, setData }) {
   const roundedInputStyle = {
     "& .MuiOutlinedInput-root": {
     borderRadius: "15px",
-    color: "white",                // text color
-    backgroundColor: "rgba(255,255,255,0.15)", // box fill (slight transparency)
+    color: "white",               
+    backgroundColor: "rgba(255,255,255,0.15)",
     "& fieldset": { borderColor: "white" },
     "&:hover fieldset": { borderColor: "white" },
     "&.Mui-focused fieldset": { borderColor: "white" },
   },
   "& .MuiInputLabel-root": { color: "white" },
-  "& .MuiInputBase-input": { color: "white" }, // input text inside
+  "& .MuiInputBase-input": { color: "white" }, 
   "& .MuiSvgIcon-root": { color: "white" },
   };
 
@@ -112,16 +112,16 @@ export default function NameLocationSlide({ data, setData }) {
                 displayEmpty
                 sx={roundedInputStyle}
               >
-                <MenuItem value="" disabled sx={{ color: "white" }}>
+                <MenuItem value="" disabled sx={{ color: "black" }}>
                   Select Country/Region
                 </MenuItem>
-                <MenuItem value="United States" sx={{ color: "white" }}>
+                <MenuItem value="United States" sx={{ color: "black" }}>
                   United States
                 </MenuItem>
-                <MenuItem value="Canada" sx={{ color: "white" }}>
+                <MenuItem value="Canada" sx={{ color: "black" }}>
                   Canada
                 </MenuItem>
-                <MenuItem value="Mexico" sx={{ color: "white" }}>
+                <MenuItem value="Mexico" sx={{ color: "black" }}>
                   Mexico
                 </MenuItem>
               </Select>
