@@ -14,8 +14,20 @@ export default function FinancialUserInputSlide({ data, setData }) {
   const fileInputRef = useRef(null);
 
   const roundedInputStyle = {
-    "& .MuiOutlinedInput-root": { borderRadius: "15px" },
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "15px",
+      color: "white",
+      backgroundColor: "rgba(32, 10, 10, 0.1)",
+      "& fieldset": { borderColor: "white" },
+      "&:hover fieldset": { borderColor: "white" },
+      "&.Mui-focused fieldset": { borderColor: "white" },
+    },
+    "& .MuiInputBase-input": { color: "white" },
+    "& .MuiSvgIcon-root": { color: "white" },
   };
+
+  const onlyDigits = (str) => (str || "").replace(/[^\d]/g, "");
+
   const set = (k) => (e) => setData({ ...data, [k]: e.target.value });
 
   const pickFile = () => fileInputRef.current?.click();
@@ -24,7 +36,7 @@ export default function FinancialUserInputSlide({ data, setData }) {
     setData({ ...data, file });
   };
 
-  const SCALE = 0.9; 
+  const SCALE = 0.9;
 
   return (
     <Box
@@ -36,10 +48,11 @@ export default function FinancialUserInputSlide({ data, setData }) {
         py: 1,
         boxSizing: "border-box",
         ml: 48,
-        mt: 2,
+        mt: 7,
         transform: `scale(${SCALE})`,
         transformOrigin: "top left",
-        width: `${100 / SCALE}%`, 
+        width: `${100 / SCALE}%`,
+        color: "white",
       }}
     >
       {/* Header */}
@@ -50,7 +63,8 @@ export default function FinancialUserInputSlide({ data, setData }) {
           textAlign: "left",
           width: "100%",
           mt: 1,
-          fontSize: "25px",
+          fontSize: "28px",
+          color: "white",
         }}
       >
         Tell us about your finances
@@ -58,7 +72,13 @@ export default function FinancialUserInputSlide({ data, setData }) {
 
       <Typography
         variant="body1"
-        sx={{ textAlign: "left", color: "gray", opacity: 1.0, mt: -2, mb: -1 }}
+        sx={{
+          textAlign: "left",
+          color: "white",
+          opacity: 0.9,
+          mt: -2,
+          mb: -1,
+        }}
       >
         We’ll personalize Moola’s recommendations based on your numbers.
       </Typography>
@@ -67,37 +87,55 @@ export default function FinancialUserInputSlide({ data, setData }) {
         {/* 1) Income + Credit score */}
         <Box sx={{ display: "flex", gap: 2 }}>
           <Box sx={{ flex: 1 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left" }}>
-              Monthly income <span style={{ color: "gray" }}>ⓘ</span>
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+            >
+              Monthly income <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
             <TextField
               fullWidth
               placeholder="e.g., 4500"
-              value={data.monthlyIncome || ""}
-              onChange={set("monthlyIncome")}
+              value={data.monthlyIncome ?? ""}
+              onChange={(e) =>
+                setData({ ...data, monthlyIncome: onlyDigits(e.target.value) })
+              }
+              onKeyDown={(e) => {
+                const bad = ["e", "E", "+", "-", ".", ","];
+                if (bad.includes(e.key)) e.preventDefault();
+              }}
+              onPaste={(e) => {
+                const t = (e.clipboardData || window.clipboardData).getData("text");
+                if (/[^\d]/.test(t)) {
+                  e.preventDefault();
+                  setData({
+                    ...data,
+                    monthlyIncome: (data.monthlyIncome || "") + onlyDigits(t),
+                  });
+                }
+              }}
+              inputMode="numeric"
+              type="text"
               sx={roundedInputStyle}
-              type="number"
-              inputProps={{ min: 0 }}
             />
           </Box>
 
           <Box sx={{ flex: 1 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left" }}>
-              Credit score <span style={{ color: "gray" }}>ⓘ</span>
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+            >
+              Credit score <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
-            <FormControl fullWidth sx={{ textAlign: "left" }}>
+            <FormControl fullWidth sx={roundedInputStyle}>
               <Select
                 value={data.creditScoreRange || "650-699"}
                 onChange={set("creditScoreRange")}
                 displayEmpty
-                sx={{
-                  "& .MuiOutlinedInput-notchedOutline": { borderRadius: "15px" },
-                  "& .MuiOutlinedInput-root": { borderRadius: "15px" },
-                  "& .MuiSelect-select": { borderRadius: "15px" },
-                }}
+                sx={roundedInputStyle}
               >
                 {["600-649", "650-699", "700-749", "750-799", "800+"].map((r) => (
-                  <MenuItem key={r} value={r}>
+                  <MenuItem key={r} value={r} sx={{ color: "black" }}>
                     {r}
                   </MenuItem>
                 ))}
@@ -109,32 +147,70 @@ export default function FinancialUserInputSlide({ data, setData }) {
         {/* 2) Housing + Debt */}
         <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
           <Box sx={{ flex: 1 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left" }}>
-              Housing (per month) <span style={{ color: "gray" }}>ⓘ</span>
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+            >
+              Housing (per month) <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
             <TextField
               fullWidth
               placeholder="e.g., 1600"
-              value={data.housing || ""}
-              onChange={set("housing")}
+              value={data.housing ?? ""}
+              onChange={(e) =>
+                setData({ ...data, housing: onlyDigits(e.target.value) })
+              }
+              onKeyDown={(e) => {
+                const bad = ["e", "E", "+", "-", ".", ","];
+                if (bad.includes(e.key)) e.preventDefault();
+              }}
+              onPaste={(e) => {
+                const t = (e.clipboardData || window.clipboardData).getData("text");
+                if (/[^\d]/.test(t)) {
+                  e.preventDefault();
+                  setData({
+                    ...data,
+                    housing: (data.housing || "") + onlyDigits(t),
+                  });
+                }
+              }}
+              inputMode="numeric"
+              type="text"
               sx={roundedInputStyle}
-              type="number"
-              inputProps={{ min: 0 }}
             />
           </Box>
 
           <Box sx={{ flex: 1 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left" }}>
-              Debt payments (per month) <span style={{ color: "gray" }}>ⓘ</span>
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+            >
+              Debt payments (per month) <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
             <TextField
               fullWidth
               placeholder="e.g., 300"
-              value={data.debt || ""}
-              onChange={set("debt")}
+              value={data.debt ?? ""}
+              onChange={(e) =>
+                setData({ ...data, debt: onlyDigits(e.target.value) })
+              }
+              onKeyDown={(e) => {
+                const bad = ["e", "E", "+", "-", ".", ","];
+                if (bad.includes(e.key)) e.preventDefault();
+              }}
+              onPaste={(e) => {
+                const t = (e.clipboardData || window.clipboardData).getData("text");
+                if (/[^\d]/.test(t)) {
+                  e.preventDefault();
+                  setData({
+                    ...data,
+                    debt: (data.debt || "") + onlyDigits(t),
+                  });
+                }
+              }}
+              inputMode="numeric"
+              type="text"
               sx={roundedInputStyle}
-              type="number"
-              inputProps={{ min: 0 }}
             />
           </Box>
         </Box>
@@ -142,88 +218,102 @@ export default function FinancialUserInputSlide({ data, setData }) {
         {/* 3) Goal + Timeframe */}
         <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
           <Box sx={{ flex: 1 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left" }}>
-              Goal <span style={{ color: "gray" }}>ⓘ</span>
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+            >
+              Goal <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
-            <FormControl fullWidth sx={{ textAlign: "left" }}>
+            <FormControl fullWidth sx={roundedInputStyle}>
               <Select
                 value={data.goal || "Build emergency fund"}
                 onChange={set("goal")}
                 displayEmpty
-                sx={{
-                  "& .MuiOutlinedInput-notchedOutline": { borderRadius: "15px" },
-                  "& .MuiOutlinedInput-root": { borderRadius: "15px" },
-                  "& .MuiSelect-select": { borderRadius: "15px" },
-                }}
+                sx={roundedInputStyle}
               >
-                <MenuItem value="Build emergency fund">Build emergency fund</MenuItem>
-                <MenuItem value="Pay off debt">Pay off debt</MenuItem>
-                <MenuItem value="Buy a home">Buy a home</MenuItem>
-                <MenuItem value="Save for retirement">Save for retirement</MenuItem>
-                <MenuItem value="General budgeting">General budgeting</MenuItem>
-                <MenuItem value="Build credit">Build credit</MenuItem>
+                <MenuItem value="Build emergency fund" sx={{ color: "black" }}>
+                  Build emergency fund
+                </MenuItem>
+                <MenuItem value="Pay off debt" sx={{ color: "black" }}>
+                  Pay off debt
+                </MenuItem>
+                <MenuItem value="Buy a home" sx={{ color: "black" }}>
+                  Buy a home
+                </MenuItem>
+                <MenuItem value="Save for retirement" sx={{ color: "black" }}>
+                  Save for retirement
+                </MenuItem>
+                <MenuItem value="General budgeting" sx={{ color: "black" }}>
+                  General budgeting
+                </MenuItem>
+                <MenuItem value="Build credit" sx={{ color: "black" }}>
+                  Build credit
+                </MenuItem>
               </Select>
             </FormControl>
           </Box>
 
           <Box sx={{ flex: 1 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left" }}>
-              Timeframe <span style={{ color: "gray" }}>ⓘ</span>
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left", color: "white" }}
+            >
+              Timeframe <span style={{ color: "white" }}>ⓘ</span>
             </Typography>
-            <FormControl fullWidth sx={{ textAlign: "left" }}>
+            <FormControl fullWidth sx={roundedInputStyle}>
               <Select
                 value={data.timeframe || "12 months"}
                 onChange={set("timeframe")}
                 displayEmpty
-                sx={{
-                  "& .MuiOutlinedInput-notchedOutline": { borderRadius: "15px" },
-                  "& .MuiOutlinedInput-root": { borderRadius: "15px" },
-                  "& .MuiSelect-select": { borderRadius: "15px" },
-                }}
+                sx={roundedInputStyle}
               >
-                <MenuItem value="3 months">3 months</MenuItem>
-                <MenuItem value="6 months">6 months</MenuItem>
-                <MenuItem value="9 months">9 months</MenuItem>
-                <MenuItem value="12 months">12 months</MenuItem>
-                <MenuItem value="18 months">18 months</MenuItem>
-                <MenuItem value="24 months">24 months</MenuItem>
+                <MenuItem value="3 months" sx={{ color: "black" }}>
+                  3 months
+                </MenuItem>
+                <MenuItem value="6 months" sx={{ color: "black" }}>
+                  6 months
+                </MenuItem>
+                <MenuItem value="9 months" sx={{ color: "black" }}>
+                  9 months
+                </MenuItem>
+                <MenuItem value="12 months" sx={{ color: "black" }}>
+                  12 months
+                </MenuItem>
+                <MenuItem value="18 months" sx={{ color: "black" }}>
+                  18 months
+                </MenuItem>
+                <MenuItem value="24 months" sx={{ color: "black" }}>
+                  24 months
+                </MenuItem>
               </Select>
             </FormControl>
           </Box>
         </Box>
 
-        {/* 4) Destination link */}
-        <Box sx={{ mt: 2 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 0.5, textAlign: "left" }}>
-            Destination link <span style={{ color: "gray" }}>ⓘ</span>
-          </Typography>
-          <TextField
-            fullWidth
-            placeholder="Link to a shared CSV / bank export / Google Sheet"
-            value={data.link || ""}
-            onChange={set("link")}
-            sx={roundedInputStyle}
-          />
-        </Box>
-
         {/* 5) Upload */}
-        <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
+        <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2, ml: 11 }}>
           <Button
             variant="outlined"
             startIcon={<CloudUploadIcon />}
             onClick={pickFile}
-            sx={{ borderRadius: "12px", textTransform: "none" }}
+            sx={{
+              borderRadius: "12px",
+              textTransform: "none",
+              borderColor: "white",
+              color: "white",
+              "&:hover": { borderColor: "white", backgroundColor: "rgba(255,255,255,0.1)" },
+            }}
           >
-            Upload statement/CSV
+            Upload statement/PDF
           </Button>
           <input
             ref={fileInputRef}
             type="file"
             hidden
-            accept=".csv,.xlsx,.xls,.pdf,.ofx,.qfx"
+            accept=".pdf"
             onChange={onFile}
           />
-          <Typography variant="body2" sx={{ color: data.file ? "text.primary" : "red" }}>
+          <Typography variant="body2" sx={{ color: data.file ? "white" : "red" }}>
             {data.file ? data.file.name : "*Required for more personalized results"}
           </Typography>
         </Box>

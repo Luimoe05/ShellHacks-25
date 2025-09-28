@@ -94,7 +94,7 @@ export default function CustomizedSteppers({ activeStep, handleNext, handleBack,
       sx={{ 
         width: '100%', 
         p: 4, 
-        color: '#fff',
+        color: '#b3b3b3ff',
         ml: -6,
         mt: -4, 
       }} 
@@ -138,18 +138,18 @@ export default function CustomizedSteppers({ activeStep, handleNext, handleBack,
         </React.Fragment>
       ) : (
         <React.Fragment>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: -9, justifyContent: 'flex-start' }}> 
+          <Box sx={{ display: 'flex', flexDirection: 'row', pt: -9, justifyContent: 'flex-start'}}> 
             <Button
               variant="outlined"
               disabled={activeStep === 0} 
               onClick={handleBack} 
               sx={{
                 mr: 1,
-                color: activeStep === 0 ? '#bdbdbd' : '#757575', 
-                borderColor: activeStep === 0 ? '#e0e0e0' : '#bdbdbd', 
-                backgroundColor: activeStep === 0 ? '#f5f5f5' : 'transparent', 
+                color: activeStep === 0 ? '#000000' : '#757575', 
+                borderColor: activeStep === 0 ? '#b6b6b6ff' : '#bdbdbd', 
+                backgroundColor: activeStep === 0 ? '#6a6a6aff' : '#4c4a4aff', 
                 '&:hover': {
-                  backgroundColor: '#eeeeee',
+                  backgroundColor: '#6f6f6fff',
                   borderColor: '#bdbdbd',
                 },
               }}
@@ -167,7 +167,7 @@ export default function CustomizedSteppers({ activeStep, handleNext, handleBack,
               variant="contained"
               sx={{
                 backgroundImage: ACTIVE_GRADIENT,
-                color: '#fff',
+                color: '#7c7b7bff',
                 border: 'none',
                 boxShadow: '0 4px 10px 0 rgba(0,0,0,.2)',
                 '&:hover': {
