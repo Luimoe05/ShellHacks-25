@@ -120,72 +120,72 @@ router.post("/save-conversation", async (req, res) => {
   }
 });
 
-// Get saved conversations for a user
-router.get("/conversations/:user_id", async (req, res) => {
-  try {
-    const { user_id } = req.params;
+// // Get saved conversations for a user
+// router.get("/conversations/:user_id", async (req, res) => {
+//   try {
+//     const { user_id } = req.params;
 
-    const { data, error } = await supabase
-      .from("conversations_and_messages")
-      .select("id, content, created_at")
-      .eq("auth0_id", user_id)
-      .eq("role", "conversation")
-      .order("created_at", { ascending: false });
+//     const { data, error } = await supabase
+//       .from("conversations_and_messages")
+//       .select("id, content, created_at")
+//       .eq("auth0_id", user_id)
+//       .eq("role", "conversation")
+//       .order("created_at", { ascending: false });
 
-    if (error) throw error;
+//     if (error) throw error;
 
-    // Parse the conversation data
-    const conversations = data.map((conv) => {
-      const content = JSON.parse(conv.content);
-      return {
-        id: conv.id,
-        title: content.title,
-        message_count: content.message_count,
-        created_at: conv.created_at,
-        last_updated: content.last_updated,
-      };
-    });
+//     // Parse the conversation data
+//     const conversations = data.map((conv) => {
+//       const content = JSON.parse(conv.content);
+//       return {
+//         id: conv.id,
+//         title: content.title,
+//         message_count: content.message_count,
+//         created_at: conv.created_at,
+//         last_updated: content.last_updated,
+//       };
+//     });
 
-    res.json({
-      success: true,
-      conversations: conversations,
-    });
-  } catch (error) {
-    console.error("Error loading conversations:", error.message);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
+//     res.json({
+//       success: true,
+//       conversations: conversations,
+//     });
+//   } catch (error) {
+//     console.error("Error loading conversations:", error.message);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// });
 
-// Load a specific conversation
-router.get("/conversation/:conversation_id", async (req, res) => {
-  try {
-    const { conversation_id } = req.params;
+// // Load a specific conversation
+// router.get("/conversation/:conversation_id", async (req, res) => {
+//   try {
+//     const { conversation_id } = req.params;
 
-    const { data, error } = await supabase
-      .from("conversations_and_messages")
-      .select("content")
-      .eq("id", conversation_id)
-      .eq("role", "conversation")
-      .single();
+//     const { data, error } = await supabase
+//       .from("conversations_and_messages")
+//       .select("content")
+//       .eq("id", conversation_id)
+//       .eq("role", "conversation")
+//       .single();
 
-    if (error) throw error;
+//     if (error) throw error;
 
-    const conversationData = JSON.parse(data.content);
+//     const conversationData = JSON.parse(data.content);
 
-    res.json({
-      success: true,
-      conversation: conversationData,
-    });
-  } catch (error) {
-    console.error("Error loading conversation:", error.message);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
+//     res.json({
+//       success: true,
+//       conversation: conversationData,
+//     });
+//   } catch (error) {
+//     console.error("Error loading conversation:", error.message);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// });
 
 export default router;
