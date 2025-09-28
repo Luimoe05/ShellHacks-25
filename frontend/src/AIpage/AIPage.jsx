@@ -1,9 +1,9 @@
 import React from "react";
 // import Gemini from "./Gemini";
-// import ChatContainer from "./Chatbox/Chatcontainer"; // Commented out - file doesn't exist
+import ChatContainer from "./Chatbox/Chatcontainer";
 import AdviceSection from "./AIComponents/AdviceSection";
-// import MoolaNavbar from "./AIComponents/Moolanavbar"; // Commented out - file doesn't exist
-// import MetricCard from "./AIComponents/MetricCard"; // Commented out - file doesn't exist
+import MoolaNavbar from "./AIComponents/MoolaNavbar"; // Fixed: capital N
+import MetricCard from "./AIComponents/MetricCard";
 // import PDFTest from "../Components/PDFTest"; // Add this import
 import { GlobalStyles, Box } from "@mui/material"; // ✅ fixed: Container was unused, removed
 
@@ -25,14 +25,12 @@ export default function AIPage() {
       />
       {/* <PDFTest /> */}
       <Box sx={{ bgcolor: "#121212" }}>
-        {/* <MoolaNavbar /> */}
+        <MoolaNavbar />
         <Box sx={{ display: "flex", flexDirection: "row" }}>
           {/* <Gemini /> */}
-          {/* <ChatContainer /> */}
+          <ChatContainer />
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             <AdviceSection />
-            {/* Commented out MetricCard section since component doesn't exist */}
-            {/*
             <Box
               sx={{
                 display: "flex",
@@ -87,7 +85,6 @@ export default function AIPage() {
                 trend="+12%"
               />
             </Box>
-            */}
           </Box>
         </Box>
       </Box>
