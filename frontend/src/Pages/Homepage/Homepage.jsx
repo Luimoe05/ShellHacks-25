@@ -44,6 +44,9 @@ export default function Homepage() {
     console.log("localStorage auth:", localStorage.getItem("isAuthenticated"));
     console.log("localStorage user:", localStorage.getItem("userInfo"));
 
+    console.log("VITE_BACKEND_URL:", import.meta.env.VITE_BACKEND_URL);
+    console.log("All env vars:", import.meta.env);
+
     fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/status`, {
       credentials: "include",
     })
