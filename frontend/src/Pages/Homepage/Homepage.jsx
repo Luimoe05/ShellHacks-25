@@ -175,7 +175,7 @@ export default function Homepage() {
           <HomepageStats stats={stats} />
           <HomepageFeatures features={features} />
           <HomepageCTA />
-          {/* <Footer /> */}
+          <Footer />
         </Container>
       </Box>
     </>
