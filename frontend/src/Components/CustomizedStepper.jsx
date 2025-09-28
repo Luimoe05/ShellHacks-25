@@ -19,7 +19,6 @@ const ACTIVE_GRADIENT = 'linear-gradient(135deg, #2E8BC0 0%, #3BB273 100%)';
 const INACTIVE_COLOR = '#424242'; 
 const LINE_COLOR = '#616161';
 
-// 1. Custom Step Connector (Adapted for Colorlib style)
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
     top: 30,
@@ -44,7 +43,6 @@ const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   },
 }));
 
-// 2. Custom Step Icon Root (The Circle)
 const ColorlibStepIconRoot = styled('div')(({ theme, ownerState }) => ({
   backgroundColor: INACTIVE_COLOR,
   zIndex: 1,
@@ -75,7 +73,6 @@ function ColorlibStepIcon(props) {
     1: <PersonSearchIcon sx={{ fontSize: 30 }} />,
     2: <LightBulbIcon sx={{ fontSize: 30 }} />,
     3: <SportsScoreIcon sx={{ fontSize: 30 }} />, 
-    4: <AttachMoneyIcon sx={{ fontSize: 30 }} />,
   };
 
   return (
@@ -85,14 +82,10 @@ function ColorlibStepIcon(props) {
   );
 }
 
-// NOTE: The local definition of `steps` is implicitly removed as it's passed via props.
 
-// ACCEPT PROPS AND REMOVE LOCAL STATE/LOGIC
 export default function CustomizedSteppers({ activeStep, handleNext, handleBack, steps }) {
   
-  // NOTE: Deleted: activeStep state, skipped state, handleNext, handleBack, handleSkip, handleReset.
   
-  // Simplified helper functions (since state is managed externally)
   const isStepOptional = (step) => false; 
   const isStepSkipped = (step) => false; 
 
@@ -102,17 +95,17 @@ export default function CustomizedSteppers({ activeStep, handleNext, handleBack,
         width: '100%', 
         p: 4, 
         color: '#fff',
-        ml: -3,
+        ml: -6,
         mt: -4, 
       }} 
       spacing={4}
     >
       <Stepper 
         alternativeLabel 
-        activeStep={activeStep} // USES PROP
+        activeStep={activeStep} 
         connector={<ColorlibConnector />}
       >
-        {steps.map((label, index) => { // USES PROP
+        {steps.map((label, index) => { 
           const stepProps = {};
           const labelProps = {};
 
@@ -127,7 +120,7 @@ export default function CustomizedSteppers({ activeStep, handleNext, handleBack,
                 StepIconComponent={ColorlibStepIcon}
                 sx={{
                   '& .MuiStepLabel-label': {
-                    color: index <= activeStep ? '#fff' : LINE_COLOR, // USES PROP
+                    color: index <= activeStep ? '#fff' : LINE_COLOR, 
                     fontWeight: 'bold',
                   },
                 }}
@@ -140,17 +133,16 @@ export default function CustomizedSteppers({ activeStep, handleNext, handleBack,
       </Stepper>
       
       {/* --- Button Area (Below Stepper) --- */}
-      {activeStep === steps.length ? ( // USES PROP
+      {activeStep === steps.length ? ( 
         <React.Fragment>
         </React.Fragment>
       ) : (
         <React.Fragment>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: -9, justifyContent: 'flex-start' }}> {/* Changed to flex-start for alignment */}
-            {/* BACK Button */}
+          <Box sx={{ display: 'flex', flexDirection: 'row', pt: -9, justifyContent: 'flex-start' }}> 
             <Button
               variant="outlined"
-              disabled={activeStep === 0} // USES PROP
-              onClick={handleBack} // USES PROP
+              disabled={activeStep === 0} 
+              onClick={handleBack} 
               sx={{
                 mr: 1,
                 color: activeStep === 0 ? '#bdbdbd' : '#757575', 
@@ -171,7 +163,7 @@ export default function CustomizedSteppers({ activeStep, handleNext, handleBack,
               </Button>
             )}
             <Button
-              onClick={handleNext} // USES PROP
+              onClick={handleNext} 
               variant="contained"
               sx={{
                 backgroundImage: ACTIVE_GRADIENT,
