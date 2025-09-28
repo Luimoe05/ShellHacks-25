@@ -29,6 +29,43 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/advice", async (req, res) => {
+  try {
+    // Get user data from query parameters or request body
+    const userData = req.query.userData ? JSON.parse(req.query.userData) : null;
+
+    if (!userData) {
+      return res.status(400).json({ error: "User data is required" });
+    }
+
+    // Create a prompt for your AI service
+    const prompt = `
+      Generate personalized financial advice for a user with the following information:
+      Name: ${userData.name || "User"}
+      Location: ${userData.city || "Unknown"}, ${userData.country || "Unknown"}
+      
+      Provide 2-3 specific, actionable financial recommendations in a friendly tone.
+      Keep it under 150 words.
+    `;
+
+    // Call your Gemini service (assuming you have getAiExplanation function)
+    const aiResponse = await getAiExplanation(prompt);
+
+    res.json({
+      success: true,
+      advice: aiResponse,
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Error generating AI advice:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to generate advice",
+      message: "Please try again later",
+    });
+  }
+});
+
 // Handle POST requests - chat with history, file uploads, everything
 router.post("/", upload.single("file"), async (req, res) => {
   let filePath = null;

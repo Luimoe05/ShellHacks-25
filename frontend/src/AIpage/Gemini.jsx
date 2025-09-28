@@ -3,7 +3,10 @@ import React, { useState, useRef, useEffect } from "react";
 import ChatHeroBot from "./Chatbox/chatboxpage.jsx";
 import { Container } from "@mui/material";
 // IMPORTANT: Please verify and replace '3000' with the actual port
-const BACKEND_URL = "http://localhost:3000/gemini";
+const BACKEND_URL = `${
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"
+}/gemini`;
+
 const USER_ID = "User";
 const AI_ID = "Gemini";
 
