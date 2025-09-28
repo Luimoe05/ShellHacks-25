@@ -177,7 +177,11 @@ export default function Homepage() {
           <HomepageHero isAuthenticated={isAuthenticated} />
           <HomepageStats stats={stats} />
           <HomepageFeatures features={features} />
-          <HomepageCTA />
+
+          {/* CTA Section */}
+          <HomepageCTA isAuthenticated={isAuthenticated}/>
+
+          {/* Footer */}
           <Footer />
         </Container>
       </Box>
