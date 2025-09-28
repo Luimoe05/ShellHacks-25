@@ -88,7 +88,6 @@ export default function HomepageFeatures({ featuresData = features }) {
                   transform: "translateY(-4px)",
                   boxShadow:
                     "0 8px 16px rgba(255, 255, 255, 0.15), 0 0 10px rgba(255, 255, 255, 0.05)",
-                  cursor: "pointer",
                 },
                 // OPTIONAL: Apply a very subtle light shadow even when not hovered
                 boxShadow: "0 2px 8px rgba(255, 255, 255, 0.1)",
