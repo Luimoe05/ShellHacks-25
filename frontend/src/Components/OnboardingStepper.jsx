@@ -51,18 +51,28 @@ export default function OnboardingStepper() {
   return (
     <SlidersNavbar>
       <BackgroundSlideWrapper>
-        <Box sx={{ width: "100%", mx: "auto", pt:0.5 }}>
+        <Box sx={{ width: "100%", mx: "auto", pt: 0.5, color: "white" }}>
           {/* 1. Renders the content that CHANGES */}
           <Box sx={{ mb: 2 }}>{slides[activeStep]}</Box>
           
           {/* 2. Renders the Stepper (and its buttons) that STAYS */}
-          <Box sx={{ 
-              width: '35%', 
-              display: 'flex', 
-              justifyContent: 'center',
+          <Box
+            sx={{
+              width: "35%",
+              display: "flex",
+              justifyContent: "center",
               ml: 62,
-              mt:-5,
-          }}>
+              mt: -5,
+              color: "white", 
+              "& .MuiStepLabel-label": { color: "white !important" },
+              "& .MuiSvgIcon-root": { color: "white !important" },
+              "& .MuiButton-root": {
+                color: "white",
+                borderColor: "white",
+                "&:hover": { borderColor: "white", backgroundColor: "rgba(255,255,255,0.1)" },
+              },
+            }}
+          >
             <CustomizedSteppers 
               activeStep={activeStep}
               handleNext={handleNext}
