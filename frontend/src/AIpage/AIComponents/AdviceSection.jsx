@@ -121,7 +121,6 @@ const AdviceSection = () => {
         p: { xs: 3, sm: 4 },
         mb: 6,
         borderRadius: 4,
-        boxShadow: "0 12px 36px rgba(0, 0, 0, 0.12)",
         borderLeft: "8px solid #55AB9B",
         display: "flex",
         alignItems: "flex-start",
@@ -130,7 +129,7 @@ const AdviceSection = () => {
         height: "fit-content",
         m: 3,
         transition: "all 0.3s ease-in-out",
-        boxShadow: "0 10px 50px rgba(255, 255, 255, 0.1)",
+        boxShadow: "0 10px 50px rgba(255, 255, 255, 0.1)", // Removed duplicate
         "&:hover": {
           transform: "translateY(-5px)",
           boxShadow: "0 10px 50px rgba(255, 255, 255, 0.2)",
