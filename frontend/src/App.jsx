@@ -17,7 +17,6 @@ function App() {
         <Route path="/onboarding" element={<OnboardingStepper />} />
         <Route path="/profile" element={<Profile />} />
       </Routes>
-      <Footer />
     </Router>
   );
 }
