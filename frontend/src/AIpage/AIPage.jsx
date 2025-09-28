@@ -2,9 +2,10 @@ import React from "react";
 // import Gemini from "./Gemini";
 import ChatContainer from "./Chatbox/Chatcontainer";
 import AdviceSection from "./AIComponents/AdviceSection";
-import MoolaNavbar from "./AIComponents/MoolaNavbar"; // Fixed: changed from "Moolanavbar" to "MoolaNavbar"
+import MoolaNavbar from "./AIComponents/Moolanavbar";
 import MetricCard from "./AIComponents/MetricCard";
 // import PDFTest from "../Components/PDFTest"; // Add this import
+
 import { GlobalStyles, Box } from "@mui/material"; // ✅ fixed: Container was unused, removed
 
 export default function AIPage() {
@@ -23,7 +24,9 @@ export default function AIPage() {
           },
         }}
       />
+
       {/* <PDFTest /> */}
+
       <Box sx={{ bgcolor: "#121212" }}>
         <MoolaNavbar />
         <Box sx={{ display: "flex", flexDirection: "row" }}>

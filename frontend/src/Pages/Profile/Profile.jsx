@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-// import ProfileNavbar from "./ProfileNavbar"; // Commented out since file doesn't exist
+import ProfileNavbar from "./ProfileNavbar";
 
 function Profile() {
   const [userData, setUserData] = useState({
     name: "",
+
     location: "",
     memberSince: "",
     primaryGoal: "",
@@ -381,7 +382,7 @@ function Profile() {
   if (loading) {
     return (
       <>
-        {/* <ProfileNavbar /> */}
+        <ProfileNavbar />
         <div style={styles.container}>
           <div style={styles.loadingContainer}>Loading your profile...</div>
         </div>
@@ -391,7 +392,7 @@ function Profile() {
 
   return (
     <>
-      {/* <ProfileNavbar /> */}
+      <ProfileNavbar />
       <div style={styles.container}>
         {error && (
           <div style={styles.errorMessage}>

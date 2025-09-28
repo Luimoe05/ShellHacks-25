@@ -2,67 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Box, Paper, Typography, CircularProgress, Alert } from "@mui/material";
 import { LightbulbOutlineRounded } from "@mui/icons-material";
 
-const API_BASE_URL = "http://localhost:3000";
-
-async function getCurrentUser() {
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_BACKEND_URL}/auth/current-user`,
-      { credentials: "include" }
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    // Your backend returns { success: true, user: {...} }
-    return data.user;
-  } catch (error) {
-    console.error("Error fetching current user:", error);
-    throw error;
-  }
-}
-
-// Fetch user data from your backend
-async function fetchUserData(auth0_id) {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/api/users/by-auth0/${auth0_id}`
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    throw error;
-  }
-}
-
-// Generate AI advice based on user data
-async function generateAIAdvice(userData) {
-  try {
-    // This would be your AI endpoint - adjust based on your implementation
-    const response = await fetch(`${API_BASE_URL}/ai/advice`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userContext: userData,
-        // You can add more context here like spending patterns, income, etc.
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error generating AI advice:", error);
-    throw error;
-  }
-}
+const API_BASE_URL =
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const AdviceSection = () => {
   const [userData, setUserData] = useState(null);
@@ -70,49 +11,73 @@ const AdviceSection = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const loadUserDataAndAdvice = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const generateAIAdvice = async (userData) => {
+    try {
+      // Encode userData as query parameter for GET request
+      const params = new URLSearchParams({
+        userData: JSON.stringify(userData),
+      });
 
-        // Get current authenticated user
-        const currentUser = await getCurrentUser();
-        console.log("Current user:", currentUser); // Add this line
-        if (!currentUser) {
-          setError("User not authenticated");
-          setLoading(false);
-          return;
-        }
+      const response = await fetch(`${API_BASE_URL}/gemini/advice?${params}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-        // Fetch user data from your database using the authenticated user's sub (not id)
-        const user = await fetchUserData(currentUser.sub);
-        setUserData(user);
-
-        // Generate AI advice based on user data
-        const advice = await generateAIAdvice(user);
-        setAiAdvice(advice.advice || advice.message);
-      } catch (err) {
-        setError(err.message || "Failed to load data");
-        // Fallback to default advice if API fails
-        setAiAdvice(
-          "We're currently unable to generate personalized advice. Please check back later."
-        );
-      } finally {
-        setLoading(false);
+      if (response.ok) {
+        const result = await response.json();
+        setAiAdvice(result.advice);
       }
-    };
+    } catch (error) {
+      console.error("Error generating AI advice:", error);
+    }
+  };
 
-    loadUserDataAndAdvice();
-  }, []); // Remove userId dependency since we're getting it from auth
+  // Fetch user profile data
+  const fetchUserProfile = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${import.meta.env?.VITE_BACKEND_URL}/profile`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Profile data received:", data); // Debug log
+      setUserData(data);
+      setError(null);
+
+      await generateAIAdvice(data);
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+      setError("Failed to load profile data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
 
   // Default advice as fallback
   const defaultAdvice = `Based on your current spending patterns and income, you have a high
-    potential for increasing savings by reviewing subscription services. We
-    recommend canceling the least used streaming service this month, which
-    could free up $22.99. Your debt-to-income ratio is healthy, but focus
-    on building a 3-month emergency fund, which is currently at 50% of the
-    goal.`;
+   potential for increasing savings by reviewing subscription services. We
+   recommend canceling the least used streaming service this month, which
+   could free up $22.99. Your debt-to-income ratio is healthy, but focus
+   on building a 3-month emergency fund, which is currently at 50% of the
+   goal.`;
 
   return (
     <Paper
@@ -121,15 +86,17 @@ const AdviceSection = () => {
         p: { xs: 3, sm: 4 },
         mb: 6,
         borderRadius: 4,
+        boxShadow: "0 12px 36px rgba(0, 0, 0, 0.12)",
         borderLeft: "8px solid #55AB9B",
         display: "flex",
         alignItems: "flex-start",
         gap: 3,
         backgroundColor: "#121212",
         height: "fit-content",
+        width: "900px",
         m: 3,
         transition: "all 0.3s ease-in-out",
-        boxShadow: "0 10px 50px rgba(255, 255, 255, 0.1)", // Removed duplicate
+        boxShadow: "0 10px 50px rgba(255, 255, 255, 0.1)",
         "&:hover": {
           transform: "translateY(-5px)",
           boxShadow: "0 10px 50px rgba(255, 255, 255, 0.2)",
