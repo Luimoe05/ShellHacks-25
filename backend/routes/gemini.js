@@ -1,12 +1,35 @@
 import express from "express";
-import pkg from "express-openid-connect";
-const { requiresAuth } = pkg;
+import multer from "multer";
+import fs from "fs";
 import { getAiExplanation } from "../gemini-service.js";
 import supabase from "../DB/supabase.js";
 
 const router = express.Router();
 
-// Main chat endpoint - handles individual messages with context
+// Multer Configuration
+const upload = multer({ dest: "uploads/" });
+
+// Handle GET requests (text-only)
+router.get("/", async (req, res) => {
+  try {
+    const userInput = req.query.text;
+    const prompt = userInput || "Hello! How can I help you?";
+
+    console.log(`Received GET request with prompt: ${prompt}`);
+
+    const explanation = await getAiExplanation(prompt, null);
+
+    res.json({ success: true, explanation: explanation });
+  } catch (error) {
+    console.error("GET Route Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// Main chat endpoint - handles individual messages with context (PRIMARY)
 router.post("/", async (req, res) => {
   try {
     const { user_id, current_message, conversation_history } = req.body;
@@ -44,6 +67,42 @@ router.post("/", async (req, res) => {
       success: false,
       message: error.message,
     });
+  }
+});
+
+// Handle file uploads
+router.post("/upload", upload.single("file"), async (req, res) => {
+  let filePath = null;
+
+  try {
+    const userInput = req.body.text;
+    const prompt = userInput || "Analyze the provided document.";
+
+    console.log(`Received POST request with prompt: ${prompt}`);
+
+    if (req.file) {
+      filePath = req.file.path;
+      console.log(`Received file at temporary path: ${filePath}`);
+    }
+
+    const explanation = await getAiExplanation(prompt, filePath);
+
+    res.json({ success: true, explanation: explanation });
+  } catch (error) {
+    console.error("POST Route Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  } finally {
+    // Cleanup file
+    if (filePath) {
+      try {
+        await fs.promises.unlink(filePath);
+      } catch (e) {
+        console.warn(`Fallback cleanup failed for ${filePath}: ${e.message}`);
+      }
+    }
   }
 });
 
@@ -119,73 +178,5 @@ router.post("/save-conversation", async (req, res) => {
     });
   }
 });
-
-// // Get saved conversations for a user
-// router.get("/conversations/:user_id", async (req, res) => {
-//   try {
-//     const { user_id } = req.params;
-
-//     const { data, error } = await supabase
-//       .from("conversations_and_messages")
-//       .select("id, content, created_at")
-//       .eq("auth0_id", user_id)
-//       .eq("role", "conversation")
-//       .order("created_at", { ascending: false });
-
-//     if (error) throw error;
-
-//     // Parse the conversation data
-//     const conversations = data.map((conv) => {
-//       const content = JSON.parse(conv.content);
-//       return {
-//         id: conv.id,
-//         title: content.title,
-//         message_count: content.message_count,
-//         created_at: conv.created_at,
-//         last_updated: content.last_updated,
-//       };
-//     });
-
-//     res.json({
-//       success: true,
-//       conversations: conversations,
-//     });
-//   } catch (error) {
-//     console.error("Error loading conversations:", error.message);
-//     res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
-//   }
-// });
-
-// // Load a specific conversation
-// router.get("/conversation/:conversation_id", async (req, res) => {
-//   try {
-//     const { conversation_id } = req.params;
-
-//     const { data, error } = await supabase
-//       .from("conversations_and_messages")
-//       .select("content")
-//       .eq("id", conversation_id)
-//       .eq("role", "conversation")
-//       .single();
-
-//     if (error) throw error;
-
-//     const conversationData = JSON.parse(data.content);
-
-//     res.json({
-//       success: true,
-//       conversation: conversationData,
-//     });
-//   } catch (error) {
-//     console.error("Error loading conversation:", error.message);
-//     res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
-//   }
-// });
 
 export default router;
