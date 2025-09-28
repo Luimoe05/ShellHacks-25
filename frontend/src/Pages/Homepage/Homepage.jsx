@@ -37,7 +37,7 @@ import { supabase } from "../../DB/supabase";
 export default function Homepage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Set to false by default
 
   // Check authentication status
   useEffect(() => {
@@ -65,20 +65,8 @@ export default function Homepage() {
       }
     }
 
-    // Fallback to API check
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/status`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setIsAuthenticated(data.isAuthenticated);
-        setUserInfo(data.user);
-        setLoading(false);
-      })
-      .catch(() => {
-        setIsAuthenticated(false);
-        setLoading(false);
-      });
+    // Remove the fallback API check that was causing CORS issues
+    setLoading(false);
   }, []);
 
   // PURE CSS APPROACH: No React state or re-renders
