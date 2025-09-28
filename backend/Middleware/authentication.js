@@ -14,26 +14,6 @@ const config = {
   routes: {
     postLogoutRedirect: process.env.FRONTEND_URL,
   },
-
-  // 🔑 CRITICAL FIX: Add the session configuration block
-  session: {
-    // This tells express-openid-connect how to configure the session cookie
-
-    cookie: {
-      // 1. MUST BE true in your deployed environment (HTTPS)
-      // This works with your 'app.set("trust proxy", 1);'
-      secure: true,
-
-      // 2. Allows the cookie to be sent during the cross-site redirect (callback)
-      // 'Lax' is the recommended setting for IdP redirects.
-      sameSite: "Lax",
-
-      // Optional: If your frontend and backend are on different subdomains (e.g., api.domain.com and app.domain.com)
-      // domain: 'your-main-domain.com'
-    },
-    // The secret is already defined at the top level, but you can override
-    // it here if needed.
-  },
 };
 
 export default auth(config);
