@@ -20,10 +20,10 @@ export default function InterestsSlide({ data, setData }) {
     "& .MuiOutlinedInput-root": {
       borderRadius: "15px",
       color: "white",
+      backgroundColor: "rgba(255,255,255,0.1)",
       "& fieldset": { borderColor: "white" },
       "&:hover fieldset": { borderColor: "white" },
       "&.Mui-focused fieldset": { borderColor: "white" },
-      backgroundColor: "rgba(255,255,255,0.1)",
     },
     "& .MuiInputBase-input": { color: "white" },
   };
@@ -69,113 +69,131 @@ export default function InterestsSlide({ data, setData }) {
   ];
 
   const isOther = (data.interestCategory || "") === "other";
-  const SCALE = 1;
+
+  const SCALE = 1; 
+  const RESPONSIVE_SCALE = 0.9;
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        px: 6,
-        py: 4,
-        boxSizing: "border-box",
-        ml: 57,
-        mt: 1,
-        transform: `scale(${SCALE})`,
-        transformOrigin: "top left",
-        width: `${100 / SCALE}%`,
-        color: "white",
-        "@media (max-width:1200px)": {
-          transform: "scale(0.82)",
-          width: `${100 / 0.82}%`,
-        },
-      }}
-    >
-      <Typography
-        variant="h4"
+    <Box sx={{ width: "100%", overflowX: "hidden" }}>
+      {/* RIGHT-ALIGN ROW */}
+      <Box
         sx={{
-          fontWeight: "bold",
-          textAlign: "left",
-          width: "100%",
-          mt: 0,
-          fontSize: "clamp(24px, 3.2vw, 25px)",
-          lineHeight: 1.15,
-          color: "white",
+          display: "flex",
+          justifyContent: "flex-end",
+          pr: { xs: 2, sm: 4, md: 8 }, 
         }}
       >
-        What are you most interested in?
-      </Typography>
-
-      <Typography
-        variant="body1"
-        sx={{
-          textAlign: "left",
-          color: "white",
-          opacity: 0.9,
-          mt: 0.5,
-          mb: 2,
-          pt: 1,
-          fontSize: "clamp(13px, 1.2vw, 16px)",
-        }}
-      >
-        Select the best description of your primary focus. You can change this
-        later.
-      </Typography>
-
-      <Box sx={{ width: { xs: "90%", md: "50%" } }}>
-        <RadioGroup
-          value={data.interestCategory || "budgeting"}
-          onChange={(e) =>
-            setData({ ...data, interestCategory: e.target.value })
-          }
+        {/* INNER (SCALED) */}
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: 1035, 
+            transform: `scale(${SCALE})`,
+            transformOrigin: "top right",
+            "@media (max-width:1200px)": {
+              transform: `scale(${RESPONSIVE_SCALE})`,
+              transformOrigin: "top right",
+            },
+          }}
         >
-          {options.map((opt) => (
-            <FormControlLabel
-              key={opt.value}
-              value={opt.value}
-              control={<Radio size="small" sx={{ color: "white" }} />}
+          {/* CONTENT */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              px: 6,
+              py: 4,
+              boxSizing: "border-box",
+              mt: 1,
+              color: "white",
+            }}
+          >
+            <Typography
+              variant="h4"
               sx={{
-                alignItems: "flex-start",
+                fontWeight: "bold",
+                textAlign: "left",
                 width: "100%",
-                mb: 2,
+                mt: 0,
+                fontSize: "clamp(24px, 3.2vw, 25px)",
+                lineHeight: 1.15,
                 color: "white",
-                "& .MuiFormControlLabel-label": {
-                  width: "100%",
-                  color: "white",
-                },
               }}
-              label={
-                <Box>
-                  <Typography
-                    sx={{
-                      fontWeight: 600,
-                      lineHeight: 1.2,
-                      fontSize: 16,
-                      color: "white",
-                    }}
-                  >
-                    {opt.label}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: "white", mt: 0.5 }}>
-                    {opt.hint}
-                  </Typography>
-                  {opt.value === "other" && isOther && (
-                    <Box sx={{ mt: 1 }}>
-                      <TextField
-                        fullWidth
-                        placeholder="Briefly describe your focus"
-                        value={data.interestOther || ""}
-                        onChange={set("interestOther")}
-                        sx={roundedInputStyle}
-                        InputProps={{ style: { color: "white" } }}
+            >
+              What are you most interested in?
+            </Typography>
+
+            <Typography
+              variant="body1"
+              sx={{
+                textAlign: "left",
+                color: "white",
+                opacity: 0.9,
+                mt: 0.5,
+                mb: 2,
+                pt: 1,
+                fontSize: "clamp(13px, 1.2vw, 16px)",
+              }}
+            >
+              Select the best description of your primary focus. You can change this later.
+            </Typography>
+
+            {/* Form width (wider/consistent) */}
+            <Box sx={{ width: { xs: "90%", md: "55%" }, minWidth: 420 }}>
+              <RadioGroup
+                value={data.interestCategory || ""}
+                onChange={(e) => setData({ ...data, interestCategory: e.target.value })}
+              >
+                {options.map((opt) => (
+                  <FormControlLabel
+                    key={opt.value}
+                    value={opt.value}
+                    control={
+                      <Radio
+                        size="small"
+                        sx={{
+                          color: "white",
+                          "&.Mui-checked": { color: "white" },
+                        }}
                       />
-                    </Box>
-                  )}
-                </Box>
-              }
-            />
-          ))}
-        </RadioGroup>
+                    }
+                    sx={{
+                      alignItems: "flex-start",
+                      width: "100%",
+                      mb: 2,
+                      color: "white",
+                      "& .MuiFormControlLabel-label": { width: "100%", color: "white" },
+                    }}
+                    label={
+                      <Box>
+                        <Typography
+                          sx={{ fontWeight: 600, lineHeight: 1.2, fontSize: 16, color: "white" }}
+                        >
+                          {opt.label}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "white", mt: 0.5 }}>
+                          {opt.hint}
+                        </Typography>
+                        {opt.value === "other" && isOther && (
+                          <Box sx={{ mt: 1 }}>
+                            <TextField
+                              fullWidth
+                              placeholder="Briefly describe your focus"
+                              value={data.interestOther || ""}
+                              onChange={set("interestOther")}
+                              sx={roundedInputStyle}
+                              InputProps={{ style: { color: "white" } }}
+                            />
+                          </Box>
+                        )}
+                      </Box>
+                    }
+                  />
+                ))}
+              </RadioGroup>
+            </Box>
+          </Box>
+        </Box>
       </Box>
     </Box>
   );

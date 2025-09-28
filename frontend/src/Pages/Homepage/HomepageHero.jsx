@@ -65,6 +65,7 @@ export default function HomepageHero({ isAuthenticated }) {
             px: 4,
             py: 1.5,
             fontSize: "1.1rem",
+            fontWeight: 600,
             boxShadow: 3,
           }}
         >
