@@ -32,6 +32,7 @@ import HomepageHero from "./HomepageHero";
 import HomepageStats from "./HomepageStats";
 import HomepageFeatures from "./HomepageFeatures";
 import HomepageCTA from "./HomepageCTA";
+import { supabase } from "../../DB/supabase";
 
 export default function Homepage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -174,7 +175,7 @@ export default function Homepage() {
           <HomepageStats stats={stats} />
           <HomepageFeatures features={features} />
           <HomepageCTA />
-          <Footer />
+          {/* <Footer /> */}
         </Container>
       </Box>
     </>

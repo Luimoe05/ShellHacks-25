@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
-// No change needed for this import: import { getAiExplanation } from "./gemini-service.js";
+import { getAiExplanation } from "./gemini-service.js";
 
 const app = express();
 
@@ -23,9 +23,11 @@ app.use(express.json());
 import authMiddleware from "./Middleware/authentication.js";
 app.use(authMiddleware);
 
-// Homepage (No change)
+// Homepage
+
 app.get("/", (req, res) => {
   if (req.oidc.isAuthenticated()) {
+    // Create URL with user data for React
     const userData = {
       name: req.oidc.user.name,
       email: req.oidc.user.email,
@@ -41,14 +43,19 @@ app.get("/", (req, res) => {
   }
 });
 
-// Routes (No change, just ensure geminiRoute points to the updated file)
 import profileRoute from "./routes/profile.js";
-import geminiRoute from "./routes/gemini.js"; // This file is now updated to handle POST
+import geminiRoute from "./routes/gemini.js";
 import authRoute from "./routes/auth.js";
+import userRoutes from "./routes/user.js";
+import conversationRoute from "./routes/conversation.js";
+import onboardingRoutes from "./routes/onboarding.js";
+app.use("/onboarding", onboardingRoutes);
 
-app.use("/gemini", geminiRoute); // This will now handle the POST request
+app.use("/gemini", geminiRoute);
 app.use("/profile", profileRoute);
 app.use("/auth", authRoute);
+app.use("/api/users", userRoutes);
+app.use("/api/conversation", conversationRoute);
 
 console.log("Routes registered!");
 
