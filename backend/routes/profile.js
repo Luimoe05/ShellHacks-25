@@ -13,23 +13,7 @@ router.get("/", requiresAuth(), async (req, res) => {
     // Fetch user data from UserInfo table
     const { data: userInfo, error } = await supabase
       .from("UserInfo")
-      .select(
-        `
-        *,
-        auth0_id,
-        name,
-        age,
-        location,
-        member_since,
-        primary_goal,
-        interest_category,
-        monthly_income,
-        credit_score,
-        total_savings,
-        timeframe,
-        created_at
-      `
-      )
+      .select("*")
       .eq("auth0_id", user.sub)
       .single();
 
@@ -41,34 +25,36 @@ router.get("/", requiresAuth(), async (req, res) => {
       });
     }
 
-    // Calculate months active (from created_at to now)
-    const createdDate = new Date(userInfo.created_at);
+    // Calculate months active from Created_at
+    const createdDate = new Date(userInfo.Created_at);
     const now = new Date();
     const monthsActive = Math.floor(
       (now - createdDate) / (1000 * 60 * 60 * 24 * 30)
     );
 
-    // Format the response to match your frontend expectations
+    // Map database columns to frontend format
     const profileData = {
-      name: userInfo.name || user.name,
-      age: userInfo.age,
-      location: userInfo.location,
-      memberSince:
-        userInfo.member_since ||
-        new Date(userInfo.created_at).toLocaleDateString("en-US", {
-          month: "long",
-          year: "numeric",
-        }),
-      primaryGoal: userInfo.primary_goal,
-      interestCategory: userInfo.interest_category,
+      name: userInfo.Name || user.name,
+      location: `${userInfo.City || ""}, ${userInfo.Country || ""}`.replace(
+        ", ",
+        userInfo.City && userInfo.Country ? ", " : ""
+      ),
+      memberSince: new Date(userInfo.Created_at).toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      }),
+      primaryGoal: userInfo.Goal,
       monthlyIncome: userInfo.monthly_income,
       creditScore: userInfo.credit_score,
-      totalSavings: userInfo.total_savings || 0,
+
       monthsActive: monthsActive > 0 ? monthsActive : 1,
       timeframe: userInfo.timeframe,
-      // Add any other fields you need
+
+      housingPayment: userInfo.housing_payment,
+      debtPayment: userInfo.debt_payment,
+      // Auth info
       auth0_id: userInfo.auth0_id,
-      email: user.email,
+      email: userInfo.Email,
       picture: user.picture,
     };
 
@@ -91,17 +77,47 @@ router.put("/", requiresAuth(), async (req, res) => {
     // Remove fields that shouldn't be updated via this endpoint
     const {
       auth0_id,
-      name,
-      age,
-      email,
+      Name,
+      Email,
       picture,
-      created_at,
+      Created_at,
+      memberSince,
       ...allowedUpdates
     } = updateData;
 
+    // Map frontend field names to database column names
+    const dbUpdateData = {};
+
+    if (allowedUpdates.location) {
+      // Split location into City and Country if it contains a comma
+      const locationParts = allowedUpdates.location
+        .split(",")
+        .map((part) => part.trim());
+      if (locationParts.length >= 2) {
+        dbUpdateData.City = locationParts[0];
+        dbUpdateData.Country = locationParts[1];
+      } else {
+        dbUpdateData.City = locationParts[0];
+      }
+    }
+
+    if (allowedUpdates.primaryGoal !== undefined)
+      dbUpdateData.Goal = allowedUpdates.primaryGoal;
+    if (allowedUpdates.monthlyIncome !== undefined)
+      dbUpdateData.monthly_income = allowedUpdates.monthlyIncome;
+    if (allowedUpdates.creditScore !== undefined)
+      dbUpdateData.credit_score = allowedUpdates.creditScore;
+    if (allowedUpdates.timeframe !== undefined)
+      dbUpdateData.timeframe = allowedUpdates.timeframe;
+
+    if (allowedUpdates.housingPayment !== undefined)
+      dbUpdateData.housing_payment = allowedUpdates.housingPayment;
+    if (allowedUpdates.debtPayment !== undefined)
+      dbUpdateData.debt_payment = allowedUpdates.debtPayment;
+
     const { data, error } = await supabase
       .from("UserInfo")
-      .update(allowedUpdates)
+      .update(dbUpdateData)
       .eq("auth0_id", user.sub)
       .select()
       .single();
@@ -116,28 +132,30 @@ router.put("/", requiresAuth(), async (req, res) => {
 
     // Return updated profile data in the same format as GET
     const monthsActive = Math.floor(
-      (new Date() - new Date(data.created_at)) / (1000 * 60 * 60 * 24 * 30)
+      (new Date() - new Date(data.Created_at)) / (1000 * 60 * 60 * 24 * 30)
     );
 
     const profileData = {
-      name: data.name || user.name,
-      age: data.age,
-      location: data.location,
-      memberSince:
-        data.member_since ||
-        new Date(data.created_at).toLocaleDateString("en-US", {
-          month: "long",
-          year: "numeric",
-        }),
-      primaryGoal: data.primary_goal,
-      interestCategory: data.interest_category,
+      name: data.Name || user.name,
+      location: `${data.City || ""}, ${data.Country || ""}`.replace(
+        ", ",
+        data.City && data.Country ? ", " : ""
+      ),
+      memberSince: new Date(data.Created_at).toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      }),
+      primaryGoal: data.Goal,
       monthlyIncome: data.monthly_income,
       creditScore: data.credit_score,
-      totalSavings: data.total_savings || 0,
+      totalSavings: 0, // Not in your schema
       monthsActive: monthsActive > 0 ? monthsActive : 1,
       timeframe: data.timeframe,
+
+      housingPayment: data.housing_payment,
+      debtPayment: data.debt_payment,
       auth0_id: data.auth0_id,
-      email: user.email,
+      email: data.Email,
       picture: user.picture,
     };
 
