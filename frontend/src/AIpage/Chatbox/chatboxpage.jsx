@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect, useState } from "react";
+import React, { useMemo, useRef, useEffect } from "react";
 import {
   Box,
   Stack,
@@ -13,19 +13,20 @@ import {
   ThemeProvider,
   createTheme,
   CircularProgress,
+  Chip, // Added Chip for displaying file name
 } from "@mui/material";
 import {
   Send as SendIcon,
   AttachFile as AttachFileIcon,
+  Close as CloseIcon, // Added CloseIcon for removing file
 } from "@mui/icons-material";
 import SmartToyRoundedIcon from "@mui/icons-material/SmartToyRounded";
 
 /**
- * ChatHeroBot is the UI component, accepting all data and handlers from Gemini.jsx.
- * All internal state and logic (initialMessages, phase, handleSend logic) have been removed.
+ * ChatHeroBot is the UI component, accepting all data and handlers from ChatContainer.jsx.
  */
 export default function ChatHeroBot({
-  // PROPS PASSED FROM GEMINI.JSX
+  // PROPS PASSED FROM ChatContainer.jsx
   messages, // The array of messages (user/AI)
   input,
   setInput,
@@ -34,12 +35,13 @@ export default function ChatHeroBot({
   messagesEndRef,
   USER_ID,
   AI_ID,
+  file, // <--- NEW: Attached file object
+  onAttachClick, // <--- NEW: Function to trigger file selection
+  onRemoveFile, // <--- NEW: Function to clear the attached file
   // UI PROPS
   accent = "linear-gradient(135deg, #2E8BC0 0%, #3BB273 100%)",
   placeholder = "Type your message… (Press Enter to send)",
 }) {
-  // Removed all internal state (messages, typing, phase, etc.)
-
   const listRef = messagesEndRef || useRef(null);
 
   const theme = useMemo(
@@ -68,16 +70,16 @@ export default function ChatHeroBot({
   // Use the parent's sendMessage function for Enter key events
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      // e.preventDefault() is handled by the form submit in sendMessage now
-      // We still prevent default here if Enter is pressed to avoid newline insertion
       e.preventDefault();
-      if (input.trim() && !isLoading) {
+      // Ensure we can send if we have a prompt OR if we have a file (for file-only queries)
+      const canSend = input.trim() || file;
+      if (canSend && !isLoading) {
         sendMessage(e);
       }
     }
   };
 
-  // --- UI PIECES ---
+  // --- UI PIECES (Moved inside for context) ---
 
   function BotCard({ text, accent }) {
     return (
@@ -97,7 +99,6 @@ export default function ChatHeroBot({
             display: "grid",
             placeItems: "center",
             flexShrink: 0,
-            // Changed to a subtle white shadow for dark mode
             boxShadow: "0 4px 16px rgba(255, 255, 255, 0.05)",
           }}
         >
@@ -113,14 +114,13 @@ export default function ChatHeroBot({
           </Avatar>
         </Box>
 
-        {/* Card bubble (will be dark grey from theme.palette.background.paper) */}
+        {/* Card bubble */}
         <Paper
           elevation={6}
           sx={{
             px: { xs: 2, sm: 2.4 },
             py: { xs: 1.8, sm: 2.2 },
-            borderRadius: 5,
-            // Changed to a subtle white shadow for dark mode
+            borderRadius: 1,
             boxShadow:
               "0 10px 28px rgba(255,255,255,0.05), 0 2px 6px rgba(255,255,255,0.03)",
             maxWidth: 620,
@@ -159,7 +159,6 @@ export default function ChatHeroBot({
             py: { xs: 1.2, sm: 1.4 },
             borderRadius: 999,
             fontWeight: 700,
-            // Changed to a subtle white shadow for dark mode
             boxShadow:
               "0 12px 26px rgba(255,255,255,0.05), 0 3px 8px rgba(255,255,255,0.03)",
           }}
@@ -170,11 +169,14 @@ export default function ChatHeroBot({
     );
   }
 
+  // --- Main Render ---
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
 
-      {/* ===== Whole Page Gradient Border (rectangular w/ soft corners) ===== */}
+      {/* Container Box and Heading (omitted for brevity) */}
+
       <Box
         sx={{
           position: "relative",
@@ -184,12 +186,10 @@ export default function ChatHeroBot({
           minHeight: "80vh",
           display: "flex",
           flexDirection: "column",
-
           p: 3,
           m: 3,
-          borderRadius: 1, // ← rectangular, slightly curved edges
+          borderRadius: 1,
           border: "4px solid transparent",
-          // Background for the border wrapper is set to dark grey
           backgroundImage: `linear-gradient(#121212, #121212), ${accent}`,
           backgroundOrigin: "padding-box, border-box",
           backgroundClip: "padding-box, border-box",
@@ -211,7 +211,7 @@ export default function ChatHeroBot({
           }}
         />
 
-        {/* Heading (aligned & shifted right) */}
+        {/* Heading (omitted for brevity) */}
         <Box
           sx={{
             position: "relative",
@@ -278,7 +278,6 @@ export default function ChatHeroBot({
           <Stack
             ref={listRef}
             spacing={3}
-            // Using a slightly different shade to distinguish from the border box
             bgcolor={"#1E1E1E"}
             sx={{
               flex: 1,
@@ -288,7 +287,6 @@ export default function ChatHeroBot({
               px: { xs: 1.75, sm: 2.25 },
             }}
           >
-            {/* FIX: messages array is now guaranteed by props */}
             {messages.map((m) =>
               m.sender === AI_ID ? (
                 <BotCard key={m.id} text={m.text} accent={accent} />
@@ -296,7 +294,6 @@ export default function ChatHeroBot({
                 <UserPill key={m.id} text={m.text} />
               )
             )}
-            {/* Removed internal typing indicator logic */}
           </Stack>
 
           {/* Composer */}
@@ -305,18 +302,35 @@ export default function ChatHeroBot({
             onSubmit={sendMessage} // Use the parent's handler
             sx={{
               borderTop: "1px solid",
-              // `borderColor: "divider"` automatically picks a light color in dark mode
               borderColor: "divider",
               px: { xs: 1.75, sm: 2.25 },
               py: 1.25,
               bgcolor: "#1E1E1E", // <--- Dark grey background
             }}
           >
+            {/* Display attached file if one exists */}
+            {file && (
+              <Box sx={{ mb: 1, px: 2, pt: 1 }}>
+                <Chip
+                  label={file.name}
+                  onDelete={onRemoveFile}
+                  deleteIcon={<CloseIcon />}
+                  sx={{ bgcolor: "#2E8BC0", color: "white", fontWeight: 600 }}
+                />
+              </Box>
+            )}
+
             <TextField
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isLoading ? "Waiting for response..." : placeholder}
+              placeholder={
+                isLoading
+                  ? "Waiting for response..."
+                  : file
+                  ? `Ask about "${file.name}" or type a new message...`
+                  : placeholder
+              }
               multiline
               maxRows={6}
               fullWidth
@@ -325,9 +339,19 @@ export default function ChatHeroBot({
                 sx: { borderRadius: 999 },
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Tooltip title="Attach">
-                      <IconButton edge="start" disabled={isLoading}>
-                        <AttachFileIcon />
+                    <Tooltip
+                      title={
+                        file
+                          ? "Change attached PDF"
+                          : "Attach PDF file (.pdf only)"
+                      }
+                    >
+                      <IconButton
+                        edge="start"
+                        disabled={isLoading}
+                        onClick={onAttachClick} // <--- Makes the attachment button functional
+                      >
+                        <AttachFileIcon color={file ? "primary" : "inherit"} />
                       </IconButton>
                     </Tooltip>
                   </InputAdornment>
@@ -344,7 +368,8 @@ export default function ChatHeroBot({
                           minWidth: 48, // Ensure button is square
                           minHeight: 48,
                         }}
-                        disabled={!input.trim() || isLoading}
+                        // Can send if there is text input OR a file attached
+                        disabled={(!input.trim() && !file) || isLoading}
                       >
                         {isLoading ? (
                           <CircularProgress size={20} color="inherit" />
@@ -362,7 +387,7 @@ export default function ChatHeroBot({
               sx={{
                 mt: 0.75,
                 display: "block",
-                color: "text.secondary", // This will be light grey in dark mode
+                color: "text.secondary",
                 textAlign: "center",
               }}
             >
@@ -374,87 +399,4 @@ export default function ChatHeroBot({
     </ThemeProvider>
   );
 }
-
-// Removed unnecessary helper functions (makeMsg, withIds) and
-// custom logic (computeReply, TypingDots) as they are not needed by the UI.
-// The remaining helper components (BotCard, UserPill) are now internal to the main function
-// or need to be moved out if they cause issues.
-// I moved them out for safety, and simplified the implementation slightly.
-
-/* ── UI Pieces (Moved outside for cleaner export) ── */
-function BotCard({ text, accent, isLoading }) {
-  return (
-    <Stack
-      direction="row"
-      spacing={1.5}
-      alignItems="flex-start"
-      sx={{ pl: 0.5 }}
-    >
-      {/* Bot icon with gradient */}
-      <Box
-        sx={{
-          width: 48,
-          height: 48,
-          borderRadius: "50%",
-          background: accent,
-          display: "grid",
-          placeItems: "center",
-          flexShrink: 0,
-          // Dark mode shadow fix
-          boxShadow: "0 4px 16px rgba(255,255,255,0.05)",
-        }}
-      >
-        <Avatar
-          sx={{ bgcolor: "#fff", width: 32, height: 32, color: "text.primary" }}
-        >
-          <SmartToyRoundedIcon fontSize="inherit" />
-        </Avatar>
-      </Box>
-
-      {/* Card bubble (uses theme.palette.background.paper in dark mode) */}
-      <Paper
-        elevation={6}
-        sx={{
-          px: { xs: 2, sm: 2.4 },
-          py: { xs: 1.8, sm: 2.2 },
-          borderRadius: 5,
-          // Dark mode shadow fix
-          boxShadow:
-            "0 10px 28px rgba(255,255,255,0.05), 0 2px 6px rgba(255,255,255,0.03)",
-          maxWidth: 620,
-          mt: -0.25,
-        }}
-      >
-        <Typography
-          variant="body1"
-          sx={{ whiteSpace: "pre-wrap", fontWeight: 600 }}
-        >
-          {text}
-        </Typography>
-      </Paper>
-    </Stack>
-  );
-}
-
-function UserPill({ text }) {
-  return (
-    <Box sx={{ display: "flex", justifyContent: "flex-end", pr: 0.5 }}>
-      <Paper
-        elevation={6}
-        sx={{
-          bgcolor: "#2E8BC0",
-          color: "#fff",
-          px: { xs: 2.8, sm: 3.2 },
-          py: { xs: 1.2, sm: 1.4 },
-          borderRadius: 999,
-          fontWeight: 700,
-          // Dark mode shadow fix
-          boxShadow:
-            "0 12px 26px rgba(255,255,255,0.05), 0 3px 8px rgba(255,255,255,0.03)",
-        }}
-      >
-        <Typography variant="subtitle1">{text}</Typography>
-      </Paper>
-    </Box>
-  );
-}
+// Note: BotCard and UserPill components are now defined inside the main component function
