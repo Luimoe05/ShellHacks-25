@@ -8,7 +8,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { AccountBalance, Menu } from "@mui/icons-material";
-
+import Profile from "../Profile/Profile";
 export default function HomepageNavbar({ isAuthenticated, userInfo }) {
   console.log("Navbar - isAuthenticated:", isAuthenticated);
   return (

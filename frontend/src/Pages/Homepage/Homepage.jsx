@@ -49,9 +49,6 @@ export default function FinancialAppHomepage() {
     console.log("localStorage auth:", localStorage.getItem("isAuthenticated"));
     console.log("localStorage user:", localStorage.getItem("userInfo"));
 
-    // Test Supabase connection
-    testSupabaseConnection();
-
     fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/status`, {
       credentials: "include",
     })

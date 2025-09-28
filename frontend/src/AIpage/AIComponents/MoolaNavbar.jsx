@@ -15,7 +15,7 @@ import { HomeRounded, AccountBalance } from "@mui/icons-material"; // Kept worki
 import MenuIcon from "@mui/icons-material/Menu"; // New, reliable import path
 import { useNavigate } from "react-router-dom";
 
-const pages = ["Financials", "Transactions", "Settings"]; // Updated pages for financial context
+const pages = ["Financials", "Transactions", "Settings", "Logout"]; // Updated pages for financial context
 const settings = ["Profile", "Logout"]; // Simplified settings
 
 export default function MoolaNavbar() {
@@ -40,6 +40,45 @@ export default function MoolaNavbar() {
   };
 
   const navigate = useNavigate();
+
+  // Handle logout functionality
+  const handleLogout = () => {
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("userInfo");
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/logout`;
+  };
+
+  // Handle Profile navigation - FIXED
+  const handleProfile = () => {
+    handleCloseUserMenu();
+    navigate("/profile"); // Navigate to your profile route
+  };
+
+  // Handle settings menu click
+  const handleSettingClick = (setting) => {
+    if (setting === "Logout") {
+      handleLogout();
+    } else if (setting === "Profile") {
+      handleProfile();
+    } else {
+      // Handle other settings
+      console.log(`${setting} clicked`);
+      handleCloseUserMenu();
+    }
+  };
+
+  // Handle page navigation for desktop menu
+  const handlePageClick = (page) => {
+    if (page === "Logout") {
+      handleLogout();
+    } else if (page === "Profile") {
+      handleProfile();
+    } else {
+      // Add navigation logic for other pages
+      handleCloseNavMenu();
+      // Example: navigate(`/${page.toLowerCase()}`);
+    }
+  };
 
   return (
     <AppBar
@@ -68,7 +107,9 @@ export default function MoolaNavbar() {
             letterSpacing: ".1rem",
             color: "inherit",
             textDecoration: "none",
+            cursor: "pointer",
           }}
+          onClick={() => navigate("/")}
         >
           Moola
         </Typography>
@@ -102,7 +143,18 @@ export default function MoolaNavbar() {
             sx={{ display: { xs: "block", md: "none" } }}
           >
             {pages.map((page) => (
-              <MenuItem key={page} onClick={handleCloseNavMenu}>
+              <MenuItem
+                key={page}
+                onClick={() => handlePageClick(page)}
+                sx={{
+                  ...(page === "Logout" && {
+                    color: "#f44336", // Red color for logout
+                    "&:hover": {
+                      backgroundColor: "rgba(244, 67, 54, 0.1)",
+                    },
+                  }),
+                }}
+              >
                 <Typography textAlign="center">{page}</Typography>
               </MenuItem>
             ))}
@@ -132,22 +184,26 @@ export default function MoolaNavbar() {
             letterSpacing: ".1rem",
             color: "inherit",
             textDecoration: "none",
+            cursor: "pointer",
           }}
+          onClick={() => navigate("/")}
         >
           Moola
         </Typography>
 
         {/* Desktop Navigation Links (Financials, Transactions, Settings) */}
         <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-          {pages.map((page) => (
-            <Button
-              key={page}
-              onClick={handleCloseNavMenu}
-              sx={{ my: 2, color: "White", display: "block" }} // Changed button color to black to match new AppBar color
-            >
-              {page}
-            </Button>
-          ))}
+          {pages
+            .filter((page) => page !== "Logout")
+            .map((page) => (
+              <Button
+                key={page}
+                onClick={() => handlePageClick(page)}
+                sx={{ my: 2, color: "White", display: "block" }}
+              >
+                {page}
+              </Button>
+            ))}
         </Box>
 
         {/* Settings Menu and Avatar */}
@@ -180,7 +236,19 @@ export default function MoolaNavbar() {
             onClose={handleCloseUserMenu}
           >
             {settings.map((setting) => (
-              <MenuItem key={setting} onClick={handleCloseUserMenu}>
+              <MenuItem
+                key={setting}
+                onClick={() => handleSettingClick(setting)}
+                sx={{
+                  // Style logout option differently if needed
+                  ...(setting === "Logout" && {
+                    color: "#f44336", // Red color for logout
+                    "&:hover": {
+                      backgroundColor: "rgba(244, 67, 54, 0.1)",
+                    },
+                  }),
+                }}
+              >
                 <Typography textAlign="center">{setting}</Typography>
               </MenuItem>
             ))}
@@ -191,7 +259,7 @@ export default function MoolaNavbar() {
         <Button
           color="inherit"
           startIcon={<HomeRounded />}
-          sx={{ ml: 2, display: { xs: "none", md: "flex" }, color: "white" }} // Changed button color to black
+          sx={{ ml: 2, display: { xs: "none", md: "flex" }, color: "white" }}
           onClick={() => navigate("/")}
         >
           Back to Home
