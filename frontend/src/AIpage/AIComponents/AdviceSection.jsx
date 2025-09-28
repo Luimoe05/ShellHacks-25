@@ -54,7 +54,7 @@ const AdviceSection = () => {
       }
 
       const data = await response.json();
-      console.log("Profile data received:", data); // Debug log
+      // console.log("Profile data received:", data); // Removed for clean deployment
       setUserData(data);
       setError(null);
 
@@ -86,7 +86,8 @@ const AdviceSection = () => {
         p: { xs: 3, sm: 4 },
         mb: 6,
         borderRadius: 4,
-        boxShadow: "0 12px 36px rgba(0, 0, 0, 0.12)",
+        // *** FIX: Removed the duplicate 'boxShadow' definition here:
+        // boxShadow: "0 12px 36px rgba(0, 0, 0, 0.12)",
         borderLeft: "8px solid #55AB9B",
         display: "flex",
         alignItems: "flex-start",
@@ -96,6 +97,7 @@ const AdviceSection = () => {
         width: "900px",
         m: 3,
         transition: "all 0.3s ease-in-out",
+        // *** FIX: Kept the intended 'boxShadow' definition here:
         boxShadow: "0 10px 50px rgba(255, 255, 255, 0.1)",
         "&:hover": {
           transform: "translateY(-5px)",
